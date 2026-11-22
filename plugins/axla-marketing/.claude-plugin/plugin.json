@@ -1,0 +1,14 @@
+{
+  "name": "axla-marketing",
+  "displayName": "Axla Marketing",
+  "version": "0.1.0",
+  "description": "Axla Inc. のマーケティングの仕事を回すスキル集（まず、一人の Google Meet でしゃべったメモを記事の下書きにする meeting-to-article）",
+  "author": {
+    "name": "Axla Inc."
+  },
+  "license": "MIT",
+  "keywords": [
+    "marketing",
+    "content"
+  ]
+}
