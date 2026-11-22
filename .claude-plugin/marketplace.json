@@ -7,13 +7,13 @@
     "name": "Axla Inc."
   },
   "metadata": {
-    "description": "AI ネイティブカンパニーを作るための Axla Inc. のプラグイン集"
+    "description": "Claude Code plugins by Axla Inc. for running an AI-native company"
   },
   "plugins": [
     {
       "name": "axla-legal",
       "source": "./plugins/axla-legal",
-      "description": "相手の契約書の雛形に、変更履歴とコメントで修正案を入れ、署名まで往復を回す",
+      "description": "Redline a contract you received with tracked changes and comments, then run the back-and-forth until signature",
       "category": "back-office",
       "keywords": [
         "legal",
@@ -24,7 +24,7 @@
     {
       "name": "axla-marketing",
       "source": "./plugins/axla-marketing",
-      "description": "一人で話した Google Meet のメモを、記事の下書きにする",
+      "description": "Turn the notes of a solo Google Meet into a draft article and an eye-catch image",
       "category": "marketing",
       "keywords": [
         "marketing",

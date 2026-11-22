@@ -1,8 +1,8 @@
 {
   "name": "axla-legal",
   "displayName": "Axla Legal",
-  "version": "0.2.0",
-  "description": "相手の契約書の雛形に、変更履歴とコメントで修正案を入れ、署名まで往復を回す（Axla の法務）",
+  "version": "0.2.1",
+  "description": "Axla's legal desk: redline a contract you received with tracked changes and comments, and run it to signature",
   "author": {
     "name": "Axla Inc."
   },

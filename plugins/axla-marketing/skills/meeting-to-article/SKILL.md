@@ -1,6 +1,6 @@
 ---
 name: meeting-to-article
-description: 一人の Google Meet で収録した Gemini メモ（文字起こし）から、サイトの記事（まずコラム）の下書きとアイキャッチを作るときに使う。「コラムのメモができた」「Meet の収録を記事にして」と頼まれたとき、または見張りの Apps Script から Drive のドキュメント ID が届いたとき。
+description: Use to turn the Gemini notes (transcript) of a solo Google Meet into a draft article (starting with columns) and an eye-catch image, when asked to turn a Meet recording into an article, or when the watcher Apps Script sends a Drive document ID. 日本語：一人の Google Meet で収録した Gemini メモ（文字起こし）から、サイトの記事（まずコラム）の下書きとアイキャッチを作るときに使う。「コラムのメモができた」「Meet の収録を記事にして」と頼まれたとき、または見張りの Apps Script から Drive のドキュメント ID が届いたとき。
 ---
 
 # Meeting to Article

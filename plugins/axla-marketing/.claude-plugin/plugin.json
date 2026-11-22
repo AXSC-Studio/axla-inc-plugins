@@ -1,8 +1,8 @@
 {
   "name": "axla-marketing",
   "displayName": "Axla Marketing",
-  "version": "0.1.0",
-  "description": "Axla Inc. のマーケティングの仕事を回すスキル集（まず、一人の Google Meet でしゃべったメモを記事の下書きにする meeting-to-article）",
+  "version": "0.1.1",
+  "description": "Axla's marketing desk: skills that run marketing work, starting with turning a solo Google Meet into a draft article (meeting-to-article)",
   "author": {
     "name": "Axla Inc."
   },

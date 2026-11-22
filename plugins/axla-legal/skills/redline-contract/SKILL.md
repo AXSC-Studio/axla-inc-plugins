@@ -1,6 +1,6 @@
 ---
 name: redline-contract
-description: 相手から届いた契約書（まず NDA）を、変更履歴とコメントで直し、相手との往復を署名まで回すときに使う。契約書の受け取り・修正案づくり・返信メールの本文づくり・台帳の更新を頼まれたとき。
+description: Use when a contract (starting with an NDA) arrives and needs a redline with tracked changes and comments, a reply email, or a ledger update, and when running the back-and-forth until signature. 日本語：相手から届いた契約書（まず NDA）を、変更履歴とコメントで直し、相手との往復を署名まで回すときに使う。契約書の受け取り・修正案づくり・返信メールの本文づくり・台帳の更新を頼まれたとき。
 ---
 
 # redline-contract（Axla Legal）
