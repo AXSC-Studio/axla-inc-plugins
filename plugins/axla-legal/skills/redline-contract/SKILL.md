@@ -1,9 +1,9 @@
 ---
-name: legal-loop
+name: redline-contract
 description: 相手から届いた契約書（まず NDA）を、変更履歴とコメントで直し、相手との往復を署名まで回すときに使う。契約書の受け取り・修正案づくり・返信メールの本文づくり・台帳の更新を頼まれたとき。
 ---
 
-# Legal Loop
+# redline-contract（Axla Legal）
 
 契約書を「受け取り → 自社の直し → 相手との往復 → 署名」まで回す。
 

@@ -128,7 +128,7 @@ Legal/
 ## git の構成
 
 ```
-axla-inc-plugins/plugins/legal-loop/   … 道具（このプラグイン。どの会社でも使える部分だけ）
+axla-inc-plugins/plugins/axla-legal/        … 道具（このプラグイン。どの会社でも使える部分だけ）
 ├── scripts/                       … 道具（README に手順）
 ├── prompts/reviewer-prompts.md    … 検証役への指示文（SemVer）
 ├── specs/legal-001-…              … この決まり

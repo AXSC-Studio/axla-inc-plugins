@@ -1,6 +1,6 @@
-# legal-loop：相手の雛形に、変更履歴とコメントで修正案を入れる道具
+# legal（redline-contract）：相手の雛形に、変更履歴とコメントで修正案を入れる道具
 
-Legal Loop（[specs/legal-001-run-contract-loop.md](../specs/legal-001-run-contract-loop.md)）の中間ループで、相手から届いた .docx に Axla の修正を **変更履歴（w:ins／w:del）** として入れ、修正ごとの理由を **Word のコメント** として付けるための道具です。
+契約のループ（[specs/legal-001-run-contract-loop.md](../specs/legal-001-run-contract-loop.md)）の中間ループで、相手から届いた .docx に Axla の修正を **変更履歴（w:ins／w:del）** として入れ、修正ごとの理由を **Word のコメント** として付けるための道具です。
 
 - 道具（このフォルダ）は汎用。**契約ごとのデータ（changes JSON・本文・相手の名前）は git に入れない**。axla-inc の `loop/legal/contracts/<契約 ID>/Redline Data.json` に置く。
 - 作った .docx を Google ドキュメントに取り込むと、変更履歴は「提案」、コメントは「コメント」になる。

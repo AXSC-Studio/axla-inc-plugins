@@ -1,7 +1,0 @@
-{
-  "name": "legal-loop",
-  "version": "0.1.0",
-  "description": "相手の契約書の雛形に、変更履歴とコメントで修正案を入れ、署名まで往復を回す（Legal Loop）",
-  "author": { "name": "Axla Inc." },
-  "license": "MIT"
-}
