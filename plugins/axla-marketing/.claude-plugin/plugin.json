@@ -1,10 +1,11 @@
 {
   "name": "axla-marketing",
   "displayName": "Axla Marketing",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Axla's marketing desk: skills that run marketing work, starting with turning a solo Google Meet into a draft article (meeting-to-article)",
   "author": {
-    "name": "Axla Inc."
+    "name": "Peaske Kawahara",
+    "url": "https://github.com/AXSC-Studio"
   },
   "license": "MIT",
   "keywords": [

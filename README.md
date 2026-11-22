@@ -24,6 +24,19 @@ Claude Code plugins that Axla Inc. builds and uses to run an AI-native company. 
 ## Where your data lives
 Plugins contain tools only. Each company's own data (its rules `LEGAL.md`, its ledger `register.csv`, per-contract records) lives in the using repository under `loop/<name>/`. Contract text never goes into a plugin or into git.
 
+## Versioning
+Each plugin follows [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PATCH`) and is versioned on its own.
+
+| Bump | When | Example |
+|---|---|---|
+| PATCH (`0.2.0` → `0.2.1`) | Wording, README or description only. Behavior does not change | Translating descriptions to English |
+| MINOR (`0.2.1` → `0.3.0`) | A new skill, a change in behavior, or a rename | Renaming `legal-loop` to `axla-legal` |
+| MAJOR (`0.x` → `1.0.0`) | We promise outside users that we will not break them without notice | Not yet |
+
+- While the version is `0.x`, anything may still change.
+- Any change inside a plugin folder must bump that plugin's version. Without a bump, installed users do not receive the change.
+- The version lives in one place only: the plugin's `.claude-plugin/plugin.json`.
+
 ## License
 MIT
 
@@ -52,6 +65,19 @@ Axla Inc. が「AI ネイティブカンパニー」を回すために作って�
 
 ### データの置き場所
 プラグインには道具だけを入れます。会社ごとのデータ（決まりの `LEGAL.md`・台帳の `register.csv`・契約ごとの記録）は、使う側のリポジトリの `loop/<名前>/` に置きます。契約書の本文は、プラグインにも git にも入れません。
+
+### 版の付け方
+プラグインごとに、世界標準の [Semantic Versioning](https://semver.org/lang/ja/)（`MAJOR.MINOR.PATCH`）で、別々に版を付けます。
+
+| 上げる位置 | 上げるとき | 例 |
+|---|---|---|
+| PATCH（`0.2.0` → `0.2.1`） | 言葉・README・説明文の直しだけ。動きは変わらない | 説明文の英語化 |
+| MINOR（`0.2.1` → `0.3.0`） | スキルを足す、動きを変える、名前を変える | `legal-loop` を `axla-legal` に改名 |
+| MAJOR（`0.x` → `1.0.0`） | 外の利用者に「予告なしに壊さない」と約束するとき | まだ先 |
+
+- 版が `0.x` のあいだは、まだ何でも変わりうる。
+- プラグインのフォルダの中を1文字でも変えたら、そのプラグインの版を必ず上げる。上げないと、入れている人に届かない。
+- 版は、そのプラグインの `.claude-plugin/plugin.json` の1か所にだけ書く。
 
 ### ライセンス
 MIT

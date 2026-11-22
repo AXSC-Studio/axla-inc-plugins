@@ -4,7 +4,8 @@
   },
   "name": "axla-inc-plugins",
   "owner": {
-    "name": "Axla Inc."
+    "name": "Axla Inc.",
+    "url": "https://github.com/AXSC-Studio"
   },
   "metadata": {
     "description": "Claude Code plugins by Axla Inc. for running an AI-native company"
@@ -19,7 +20,11 @@
         "legal",
         "contract",
         "back-office"
-      ]
+      ],
+      "author": {
+        "name": "Peaske Kawahara",
+        "url": "https://github.com/AXSC-Studio"
+      }
     },
     {
       "name": "axla-marketing",
@@ -29,7 +34,11 @@
       "keywords": [
         "marketing",
         "content"
-      ]
+      ],
+      "author": {
+        "name": "Peaske Kawahara",
+        "url": "https://github.com/AXSC-Studio"
+      }
     }
   ]
 }
