@@ -1,0 +1,12 @@
+{
+  "name": "axla-inc-plugins",
+  "owner": { "name": "Axla Inc." },
+  "metadata": { "description": "AI ネイティブカンパニーを作るための Axla Inc. のプラグイン集" },
+  "plugins": [
+    {
+      "name": "legal-loop",
+      "source": "./plugins/legal-loop",
+      "description": "相手の契約書の雛形に、変更履歴とコメントで修正案を入れ、署名まで往復を回す"
+    }
+  ]
+}
