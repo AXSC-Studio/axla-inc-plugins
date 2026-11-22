@@ -1,10 +1,11 @@
 {
   "name": "axla-legal",
   "displayName": "Axla Legal",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Axla's legal desk: redline a contract you received with tracked changes and comments, and run it to signature",
   "author": {
-    "name": "Axla Inc."
+    "name": "Peaske Kawahara",
+    "url": "https://github.com/AXSC-Studio"
   },
   "license": "MIT"
 }
