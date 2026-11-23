@@ -10,8 +10,43 @@ A Claude Code plugin that runs a contract you received (starting with NDAs) from
 - Builds the clean copy to send and the reply email body with tools, not by hand
 - Records each contract's status, version and number of round trips in a ledger (`register.csv`)
 
+## Requirements
+- **Claude Code** (terminal, desktop or IDE). It does not run in a claude.ai chat: the tools run locally.
+- **Python 3.13** with `defusedxml` and `lxml` in a virtual environment (`scripts/requirements.txt`), and **git**.
+- **Google Drive and Gmail connectors** in Claude, for the original, the internal Google Doc and reply drafts.
+- The `docx` skill (Anthropic) for `comment.py` and `validate.py` (see `scripts/README.md`, "comment.py").
+- Built for **Japanese-language contracts (.docx) and Japanese business practice**. Unlike a general legal-review plugin, it edits the .docx itself and enforces the pre-send checks with hooks.
+
+## Install
+```
+/plugin marketplace add AXSC-Studio/axla-inc-plugins
+/plugin install axla-legal@axla-inc-plugins
+```
+
+## Data and network
+| Where it goes | What | Why |
+|---|---|---|
+| The Claude model you use | The text Claude reads (contract, your rules, records) | As in any Claude Code session |
+| Your Google Drive (connector) | Reads the original; creates the internal Google Doc | Review by your CEO or legal owner |
+| Your Gmail (connector) | Creates and reads reply drafts | Sending is always done by a person |
+| Google Drive API (optional) | `resolve_comments.py`, with your own `gcloud` token | Only when fixing an existing Google Doc |
+| Your Claude routine (optional) | `notify_reply.gs` sends a Gmail thread ID only | Wakes a watcher when a reply arrives |
+
+Hooks run locally. Nothing is sent to Axla Inc. Details: [PRIVACY.md](PRIVACY.md).
+
+## Data handling
+- Per-contract records stay in your repository under `loop/legal/contracts/<id>/`, which must be git-ignored (the tools stop if it is not). The ledger has no counterparty names.
+- Tools such as `view.py` print contract text, so it appears in your session transcript. Keep sessions private.
+- Delete the work folder after each round (`rm -rf "$W"`), and the record folder when the contract no longer needs it.
+
+## Troubleshooting
+- **"loop/legal/contracts/ is not git-ignored"**: add the line from `templates/gitignore.txt` to your `.gitignore`.
+- **A hook blocked an action**: read the reason; it names the missing check (clean copy, draft check, …). Run that step instead of working around it.
+- **`${CLAUDE_PLUGIN_ROOT}` is empty in a shell**: it is only expanded inside skills; use the absolute path shown by the skill.
+- **The draft check never runs**: read the draft with `get_draft` and `messageFormat=RAW`; the hook checks it.
+
 ## How to use
-1. Install: `/plugin install axla-legal@axla-inc-plugins`
+1. Install (above)
 2. In the repository where you will use it, create `loop/legal/` and put your own rules `LEGAL.md` and your ledger `register.csv` there (columns are in [docs/register.md](docs/register.md))
 3. Add one line to that repository's `.gitignore`: `loop/legal/contracts/` (the tools stop if it is missing)
 4. Type `/axla-legal:loop` (or ask "Please review this contract"). The entry reads where each contract stands and runs only the next step: `intake` → `redline-contract` → `review` → `gdoc` → `send` → `learn`. It stops and tells you when it is waiting for a person (final OK, sending, signing)
@@ -58,8 +93,43 @@ MIT
 - 相手へ送る清書と、返信メールの本文を道具で作る（手で書かない）
 - 台帳（`register.csv`）に、契約ごとの状態・版・往復の回数を記録する
 
+### 前提
+- **Claude Code**（端末・デスクトップ・IDE）。claude.ai のチャットでは動かない（道具を手元で動かすため）。
+- **Python 3.13** と、仮想環境の `defusedxml`・`lxml`（`scripts/requirements.txt`）、**git**。
+- Claude の **Google ドライブと Gmail のつながり**（原本・社内用の Google ドキュメント・返信の下書きのため）。
+- Anthropic の `docx` スキル（`comment.py` と `validate.py`。`scripts/README.md` の「comment.py の入手先」）。
+- **日本語の契約（.docx）と日本の実務向け**。一般の法務レビューのプラグインと違い、.docx そのものを直し、送る前の確認を Hook で止める。
+
+### 入れ方
+```
+/plugin marketplace add AXSC-Studio/axla-inc-plugins
+/plugin install axla-legal@axla-inc-plugins
+```
+
+### 通信先
+| 送り先 | 何を | なぜ |
+|---|---|---|
+| あなたが使う Claude のモデル | Claude が読む文（契約書・決まり・記録） | ほかの Claude Code のセッションと同じ |
+| あなたの Google ドライブ（つながり） | 原本を読む。社内用の Google ドキュメントを作る | 代表や法務の担当が見るため |
+| あなたの Gmail（つながり） | 返信の下書きを作って読む | 送信は必ず人が押す |
+| Google ドライブの API（任意） | `resolve_comments.py`（あなた自身の `gcloud` のトークン） | 前からある Google ドキュメントを直すときだけ |
+| あなたの Claude のルーティン（任意） | `notify_reply.gs` が Gmail のスレッド ID だけを送る | 返事が来たら見張りを起こすため |
+
+Hook は手元だけで動きます。Axla Inc. には何も送りません。くわしくは [PRIVACY.md](PRIVACY.md)。
+
+### データの扱い
+- 契約ごとの記録は、あなたのリポジトリの `loop/legal/contracts/<ID>/` に置き、git の除外に入れる（入っていなければ道具が止まる）。台帳には相手の名前を書かない。
+- `view.py` などは契約の本文を画面に出すので、本文がセッションの記録に残る。セッションは自分だけのものにしておく。
+- 往復ごとに作業フォルダを消す（`rm -rf "$W"`）。契約が要らなくなったら、記録フォルダも消す。
+
+### 困ったとき
+- **「loop/legal/contracts/ が git の除外に入っていない」**：`templates/gitignore.txt` の1行を `.gitignore` に足す。
+- **Hook に止められた**：理由を読む。足りない確認（清書・下書きの検査 …）の名前が出ているので、回り道をせず、その手順をやる。
+- **シェルで `${CLAUDE_PLUGIN_ROOT}` が空**：スキルの中でしか置き換わらない。スキルに出ている絶対パスを使う。
+- **下書きの検査が走らない**：`get_draft` を `messageFormat=RAW` で読む。Hook が検査する。
+
 ### 使い方
-1. 入れる：`/plugin install axla-legal@axla-inc-plugins`
+1. 入れる（上の「入れ方」）
 2. 使う側のリポジトリに `loop/legal/` を作り、自社の決まり `LEGAL.md` と台帳 `register.csv` を置く（列は [docs/register.md](docs/register.md)）
 3. そのリポジトリの `.gitignore` に `loop/legal/contracts/` の1行を足す（無いと道具が止まる）
 4. `/axla-legal:loop` と打つ（または「この契約書を見て」と頼む）。入口が契約ごとにいまどこかを読み、次の1歩だけを進める：`intake` → `redline-contract` → `review` → `gdoc` → `send` → `learn`。人を待つ所（最終 OK・送信・署名）では止まって知らせる
