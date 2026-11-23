@@ -27,6 +27,7 @@ description: Use to start an in-person event you host, or to re-plan it when con
 
 ## 2. 一式を作る（1周目）
 1. `plan.md` を埋める。目的は社内向けと相手向けを分ける。目標の線は数と定義まで。人の判断が要る所は【G1】、会場が決まる前の数字は【仮】。実名は書かない（番号）。
+   目標の線は `lines.json` に書き（metric と target）、**告知の公開の前に** `python3 "$S/judge_lines.py" seal --event <フォルダ>` で封じる（checklist の `lines` が達成になる。封じないと hook が公開を止める）。
 2. `budget.json` を埋め、`python3 "$S/recalc_budget.py" --event <フォルダ>`。**収支は手で計算しない**。確かめていない前提は `unverified` に入れる（budget.md に「未確認」と出る）。
 3. 資料一式を `kit/` に作る。形は config の `adapters`（`${CLAUDE_PLUGIN_ROOT}/event-ops/adapters/README.md`）。
    - 告知：`event.json` を埋めて `python3 "$S/event_page.py" --event <フォルダ>`（定員・参加費が budget.json と違えば止まる。visibility はいつも private）。アイキャッチは `python3 "$S/make_eyecatch.py" --title … --date … --out <フォルダ>/kit/eyecatch.png`

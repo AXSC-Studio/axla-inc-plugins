@@ -22,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import eventops_lib as lib  # noqa: E402
 
 PLUGIN_TEMPLATES = Path(__file__).resolve().parent.parent / "templates"
-PER_EVENT = ["plan.md", "event-log.md", "checklist.json", "budget.json", "state.json", "event.json", "run-sheet.md"]
+PER_EVENT = ["plan.md", "event-log.md", "checklist.json", "budget.json", "state.json", "event.json", "run-sheet.md", "lines.json"]
 BOOTSTRAP = ["EVENTS.md", "config.json", "register.csv", "partners.csv", "names.local.example"]
 
 
@@ -62,8 +62,7 @@ def cmd_init(a, quiet=False):
     for i in data.get("items", []):
         i["passes"], i["evidence"] = False, None  # どのひな形から来ても、未達から始める
     lib.save_json(lib.checklist_path(event), data)
-    with open(base / "register.csv", "a", newline="", encoding="utf-8") as f:
-        csv.writer(f).writerow([a.id, "planning", lib.now_iso()[:10], "", "", "", "", ""])
+    lib.set_register(base, a.id, state="planning", created=lib.now_iso()[:10])
     lib.record_run(base, "inner", "trigger", "event_created", None, event=a.id)
     if not quiet:
         print(f"{a.id} を作りました：{event}")

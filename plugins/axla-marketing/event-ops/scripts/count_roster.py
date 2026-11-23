@@ -26,18 +26,7 @@ YES = {"yes", "true", "1", "はい", "y"}
 
 
 def update_register(base, event_id, counts):
-    f = base / "register.csv"
-    with open(f, encoding="utf-8") as fh:
-        reader = csv.DictReader(fh)
-        fields = reader.fieldnames
-        rows = list(reader)
-    for r in rows:
-        if r["id"] == event_id:
-            r.update({k: str(v) for k, v in counts.items()})
-    with open(f, "w", newline="", encoding="utf-8") as fh:
-        w = csv.DictWriter(fh, fieldnames=fields)
-        w.writeheader()
-        w.writerows(rows)
+    lib.set_register(base, event_id, **counts)
 
 
 def main():
