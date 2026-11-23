@@ -1,9 +1,9 @@
 """文字だけのアイキャッチを作る（無料。外の API を呼ばない）。
 
 使い方:
-    python3 -I make_eyecatch.py --title "<題>" --date yyyy-mm-dd --config <loop/meet-to-article/config.json> --out eyecatch.png
+    python3 -I make_eyecatch.py --title "<題>" --date yyyy-mm-dd --config <loop/marketing/meeting-to-article.json> --out eyecatch.png
 
-config.json の eyecatch:
+meeting-to-article.json の eyecatch:
     {"size": [1200, 630], "bg": "#111111", "fg": "#ffffff", "accent": "#c8a96a",
      "label": "COLUMN", "font": "<日本語が出るフォントのパス>"}
 """
