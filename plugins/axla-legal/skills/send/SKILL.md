@@ -7,7 +7,7 @@ description: Part of Axla Legal, normally called from /axla-legal:loop. After th
 
 道具：`${CLAUDE_PLUGIN_ROOT}/scripts`。決まりは spec の「送る前のゲート」。柵（Hook）が飛ばしを止める。
 
-1. 清書：`make_clean.py <work> --out <W>/clean.docx --date <date> --record <記録フォルダ>`。PDF に書き出して1回だけ目で確かめ、Drive の契約フォルダに `…_vX.Y.Z_Axla Comments.docx` で置く。
+1. 清書：`make_clean.py <work> --out <W>/clean.docx --date <date> --record <記録フォルダ>`。PDF に書き出して1回だけ目で確かめ、Drive の契約フォルダに `…_vX.Y.Z_<自社名> Comments.docx` で置く。
 2. 返信文：`make_reply.py "<記録フォルダ>/Redline Data.json" --out-text <W>/reply.txt --out-html <W>/reply.html --record <記録フォルダ>`。手で書かない。
 3. 下書き：Gmail のつながりの `create_draft`（相手のメールのスレッドへの返信。添付なし・画像なし）。
 4. 検査：`get_draft` を `messageFormat=RAW` で読む。Hook がその場で検査して記録する。NG なら直す（引用の画像は、代表に Gmail の画面で消してもらう）。

@@ -1,14 +1,15 @@
 """展開した .docx の word/document.xml に、changes JSON の修正を変更履歴（w:ins / w:del）で入れる。
 
 使い方:
-    python -I redline.py <unpacked_dir> <changes.json> [--author "Analy┊Axla Inc."] [--date 2026-11-16T00:00:00Z]
+    python -I redline.py <unpacked_dir> <changes.json> [--author "<作成者名>"] [--date 2026-11-16T00:00:00Z]
 
 --date を省くと、changes JSON の "date"、それもなければ実行時刻（UTC）を使う。送った版で使った日時を
 JSON の "date" に残しておくと、同じ JSON から同じ document.xml を作り直せる（再現テスト）。
 
 changes JSON の形は README.md を参照。段落は w14:paraId で指す。
 新しく足す段落には、--new-para-id-start（16進8桁）から順に ID を振る（コメントで参照できるように）。
---author を省くと、changes JSON の "author" を使う。どちらもなければ Axla 側の標準の作成者名「Analy┊Axla Inc.」（区切りは全角の「┊」U+250A）。
+--author を省くと、changes JSON の "author"、それもなければ利用側の loop/legal/config.json の "author" を使う。
+どれにも無ければ止まる（作成者名をコードに決め打ちしない。Issue #5）。
 
 Google ドキュメントから書き出した文書の空の包み（タグ goog_rdk_N の w:sdt）は、先に外す（文字は変えない）。
 新しく振る変更履歴の ID と段落の ID が、文書にもとからある ID とぶつかるときは、書く前に止める。
@@ -19,6 +20,7 @@ Google ドキュメントから書き出した文書の空の包み（タグ goo
 """
 import argparse
 import datetime
+import os
 import difflib
 import html
 import json
@@ -36,10 +38,12 @@ args = ap.parse_args()
 
 D = args.unpacked + '/word/document.xml'
 spec = json.load(open(args.changes, encoding='utf-8'))
-args.author = args.author or spec.get('author') or 'Analy┊Axla Inc.'  # Axla 側の標準の作成者名
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import gate  # noqa: E402
+args.author = args.author or spec.get('author') or gate.load_config(os.path.abspath(args.changes)).get('author')
 args.date = args.date or spec.get('date') or datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 if not args.author:
-    sys.exit('作成者がない：--author か、changes JSON の "author" を指定する')
+    sys.exit('作成者名がない：--author か、changes JSON の "author" か、利用側の loop/legal/config.json の "author" に書く')
 x = open(D, encoding='utf-8').read()
 
 

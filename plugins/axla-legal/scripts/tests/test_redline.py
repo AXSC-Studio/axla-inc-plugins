@@ -82,5 +82,48 @@ class TestRedline(unittest.TestCase):
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
 
 
+class TestAuthorFromConfig(unittest.TestCase):
+    """作成者名をコードに決め打ちせず、利用側の config.json から読む（Issue #5）。"""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = self.tmp.name
+        self.c = os.path.join(self.root, 'loop', 'legal', 'contracts', '990101_NDA_1')
+        os.makedirs(self.c)
+        self.d = make(self.root, goog_para('00000001', 0, '第1条 甲は乙に開示する。'))
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def redline(self, author=None):
+        p = os.path.join(self.c, 'Redline Data.json')
+        spec = {'date': '2026-01-01T00:00:00Z', 'changes': [{'op': 'rebuild', 'para': '00000001', 'text': '第1条 甲は乙に開示しない。'}]}
+        if author:
+            spec['author'] = author
+        with open(p, 'w', encoding='utf-8') as f:
+            json.dump(spec, f, ensure_ascii=False)
+        return subprocess.run([sys.executable, '-I', REDLINE, self.d, p], capture_output=True, text=True)
+
+    def test_no_author_anywhere_stops(self):
+        before = doc(self.d)
+        r = self.redline()
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn('config.json', r.stderr)
+        self.assertEqual(before, doc(self.d))
+
+    def test_author_from_config(self):
+        with open(os.path.join(self.root, 'loop', 'legal', 'config.json'), 'w', encoding='utf-8') as f:
+            json.dump({'author': 'Reviewer┊Sample Studio'}, f, ensure_ascii=False)
+        r = self.redline()
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn('w:author="Reviewer┊Sample Studio"', doc(self.d))
+        self.assertNotIn('Axla', doc(self.d))
+
+    def test_template_placeholder_is_ignored(self):
+        with open(os.path.join(self.root, 'loop', 'legal', 'config.json'), 'w', encoding='utf-8') as f:
+            json.dump({'author': '<変更履歴とコメントの作成者名>'}, f, ensure_ascii=False)
+        self.assertNotEqual(self.redline().returncode, 0)
+
+
 if __name__ == '__main__':
     unittest.main()

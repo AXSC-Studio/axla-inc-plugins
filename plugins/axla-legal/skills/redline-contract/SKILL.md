@@ -9,7 +9,7 @@ description: Part of Axla Legal, normally called from /axla-legal:loop. Writes y
 
 道具：`${CLAUDE_PLUGIN_ROOT}/scripts`（Bash ではこの絶対パスを使う。`${CLAUDE_PLUGIN_ROOT}` は Bash の中では置き換わらない）。手順の細部は [scripts/README.md](${CLAUDE_PLUGIN_ROOT}/scripts/README.md) の手順 1〜6。
 
-1. `loop/legal/LEGAL.md` を全文読む（書き換えない）。
+1. `loop/legal/LEGAL.md` を全文読む（書き換えない）。自社名・作成者名は `loop/legal/config.json`（無ければ `templates/config.json` を写して埋めてもらうよう人に頼む）。
 2. 原本を作業フォルダに展開し、段落の ID を調べて、`<記録フォルダ>/Redline Data.json` に直しとコメントを書く（1往復で締結できる量に絞る）。
 3. `redline.py` で変更履歴を入れる（Google ドキュメント製の雛形の包みは道具が外す）。`add_comments.py` で理由のコメントを入れる。
 4. 形式を検査する（docx スキルの validate.py）。

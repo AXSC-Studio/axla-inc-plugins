@@ -2,7 +2,7 @@
 
 契約のループ（[specs/legal-001-run-contract-loop.md](../specs/legal-001-run-contract-loop.md)）の中間ループで、相手から届いた .docx に Axla の修正を **変更履歴（w:ins／w:del）** として入れ、修正ごとの理由を **Word のコメント** として付けるための道具です。
 
-- 道具（このフォルダ）は汎用。**契約ごとのデータ（changes JSON・本文・相手の名前）は git に入れない**。axla-inc の `loop/legal/contracts/<契約 ID>/Redline Data.json` に置く。
+- 道具（このフォルダ）は汎用。**契約ごとのデータ（changes JSON・本文・相手の名前）は git に入れない**。利用側のリポジトリの `loop/legal/contracts/<契約 ID>/Redline Data.json` に置く。
 - 作った .docx を Google ドキュメントに取り込むと、変更履歴は「提案」、コメントは「コメント」になる。
 
 ## 中身
@@ -40,7 +40,7 @@ python3.13 -m venv <作業フォルダ>/venv
 <作業フォルダ>/venv/bin/pip install -r "$T/requirements.txt"
 ```
 
-- 契約ごとの記録（changes JSON の `Redline Data.json`、`loop-log.md`）は、axla-inc の `loop/legal/contracts/<契約 ID>/` に置く（git に入れない。使う側のリポジトリの .gitignore に `loop/legal/contracts/` の1行が要る。無ければ gate.py を使う道具が書く前に止まる）。下の `C` がこのフォルダ。
+- 契約ごとの記録（changes JSON の `Redline Data.json`、`loop-log.md`）は、利用側のリポジトリの `loop/legal/contracts/<契約 ID>/` に置く（git に入れない。使う側のリポジトリの .gitignore に `loop/legal/contracts/` の1行が要る。無ければ gate.py を使う道具が書く前に止まる）。下の `C` がこのフォルダ。
 - .docx を展開したり作ったりする作業フォルダ `W` は、scratchpad など使い捨ての場所でよい。最後に残すもの（JSON・Loop Log）は `C` に置き、scratchpad だけに残さない。
 - 外から来た .docx は信用しないデータとして扱う。展開は `zipfile` で行い（`unzip` は使わない）、スクリプトはパスを引数で渡して `python -I` で動かす。
 
@@ -80,7 +80,7 @@ $W/venv/bin/python $T/add_comments.py $W/work "$C/Redline Data.json" --comment-p
 
 # 5. 再圧縮して、形式を検査する
 (cd $W/work && zip -qXrDy ../redline.docx .)
-$W/venv/bin/python $SK/office/validate.py $W/redline.docx --original $W/original.docx --author "Analy┊Axla Inc."
+$W/venv/bin/python $SK/office/validate.py $W/redline.docx --original $W/original.docx --author "<作成者名>"
 
 #    内側のループを1周回すたびに数える（その送付の中＝Y が同じ間で数える）。予算切れなら終了コード 3 → 司令塔に上げる
 #    合否は、検証役の出力（$W/review-*.md に保存）を道具で数え直して決める
@@ -95,7 +95,7 @@ python3 -I $T/view.py $W/work accept > $W/accepted.txt   # 最後に検証した
 
 # 7. 内側のループが通ったら、社内用の gdoc を1回だけ作る（Issue #33。gcloud は使わない）。
 #    Google ドライブのつながりの create_file で、$W/redline.docx を Drive の契約フォルダに Google ドキュメントとして作る。
-#    名前は <契約フォルダ名>_vX.Y.Z_Axla Comments。前に作った同じ版の gdoc があれば、ゴミ箱に移す（リンクは変わる）。
+#    名前は <契約フォルダ名>_vX.Y.Z_<自社名> Comments。前に作った同じ版の gdoc があれば、ゴミ箱に移す（リンクは変わる）。
 python3 -I $T/gate.py mark $C gdoc --id <作った gdoc の ID>
 
 # 8. gdoc を開き、提案と開いているコメントの数が changes JSON の comments の数と同じことを確かめる。
@@ -109,7 +109,7 @@ python3 -I $T/gate.py mark $C approval
 #    --record を付けると gate.json に記録され、これが無いと Hook は返信の下書きを作らせない
 python3 -I $T/make_clean.py $W/work --out $W/clean.docx --date <changes JSON の date> --record $C
 #    清書を PDF に書き出して目で確かめる（下線の残り・署名欄の折れ）。通ったら、clean.docx を
-#    <契約フォルダ名>_vX.Y.Z_Axla Comments.docx として契約フォルダに置く
+#    <契約フォルダ名>_vX.Y.Z_<自社名> Comments.docx として契約フォルダに置く
 
 # 10. 返信メールの本文を作る（手で書かない）。下書きは、相手のメールのスレッドの中に作り、添付は代表が付ける
 #    --record で reply.txt の写しを $C に置く（Hook が下書きの検査で使う）
@@ -132,7 +132,7 @@ python3 -I $T/check_draft.py <get_message の結果のファイル> --expect-att
 ```
 
 - 取り込む前の版は、Drive の版の履歴に残る。戻すときは、前の版の .docx をもう一度取り込む。
-- 相手に送る .docx は清書（`clean.docx`）。変更履歴とコメントはなく、何を直したか・理由はメール本文（make_reply.py）で伝える。`<契約フォルダ名>_vX.Y.Z_Axla Comments.docx` という名前で、Drive の契約フォルダに変換なしで置く（送った版の記録。N は相手との境目をまたいだ回数。specs/legal-001 の「版の決まり」）。Gmail の添付名は 120 文字までなので、長いときは役割名を短くする。
+- 相手に送る .docx は清書（`clean.docx`）。変更履歴とコメントはなく、何を直したか・理由はメール本文（make_reply.py）で伝える。`<契約フォルダ名>_vX.Y.Z_<自社名> Comments.docx` という名前で、Drive の契約フォルダに変換なしで置く（送った版の記録。N は相手との境目をまたいだ回数。specs/legal-001 の「版の決まり」）。Gmail の添付名は 120 文字までなので、長いときは役割名を短くする。
 
 ### 段落の ID の調べ方
 
@@ -154,7 +154,7 @@ EOF
 ```json
 {
   "schema": "legal-loop/changes v1",
-  "author": "Analy┊Axla Inc.",
+  "author": "<作成者名（例：Reviewer┊Sample Studio）>",
   "initials": "AX",
   "date": "<送った版で使った日時（UTC）。例 2026-01-01T00:00:00Z>",
   "changes": [
@@ -181,7 +181,7 @@ EOF
 - `clear_underline: true` を付けると、その段落の残す文字と足す文字から下線を外す（雛形で空欄を示していた下線が、埋めた文字に残らないように）。外した下線は書式の変更履歴（`w:rPrChange`）として残る。
 - `substitute` は、段落の中に `old` がちょうど1回あるときだけ動く。長い段落の一部を変えるときに使う。
 - **制約**：`rebuild`・`substitute`・`delete` は、段落を「ランの文字」だけで組み直す。段落の中にハイパーリンク・ブックマーク・タブ・改行・フィールド・コメントの印・図・既存の変更履歴などがあると消えてしまうので、`redline.py` はその段落で止まる（エラーで終わる）。そういう段落は Word などで手で直すか、`insert_after`／`insert_before` で別の段落として足す。
-- `author`／`initials` は、`--author`／`--initials` を省いたときの既定値。Axla 側の作成者名の標準は「Analy┊Axla Inc.」（区切りは全角の「┊」U+250A）。JSON にもなければ、redline.py と add_comments.py はこの名前を使う。社内 gdoc に取り込んだコメントには、名前だけが出る（顔写真は付けられない）。
+- `author`／`initials` は、`--author`／`--initials` を省いたときの既定値。JSON にもなければ、利用側の `loop/legal/config.json` の `author`／`initials` を使う（ひな形は `templates/config.json`）。どこにも無ければ、redline.py と add_comments.py は止まる（作成者名をコードに決め打ちしない）。社内 gdoc に取り込んだコメントには、名前だけが出る（顔写真は付けられない）。
 - `add_comments.py` のコメントの ID は、原本にある既存のコメントの ID の最大＋1 から振る（`--comment-id-start` で指定もできる）。
 - `insert_after`／`insert_before` で足した段落には、`--new-para-id-start`（既定 `1A000000`）の次の番号から順に `w14:paraId` が振られる（`1A000001`、`1A000002`、…）。コメントの `start`／`end` には、この番号を使える。
 - 変更履歴の `w:id` は `--rev-id-start`（既定 9000）の次から振る。原本の既存の ID とぶつからないようにする。
@@ -259,7 +259,7 @@ C=loop/legal/contracts/<契約 ID>
 
 ## 再現テスト（道具を直したら必ず）
 
-1件目の送付版で確かめた手順。Drive の `_vX.1.0_<相手> Original.docx` と `loop/legal/contracts/<契約 ID>/Redline Data.json` から作り直し、送った `_vX.Y.Z_Axla Comments.docx` と比べる。
+1件目の送付版で確かめた手順。Drive の `_vX.1.0_<相手> Original.docx` と `loop/legal/contracts/<契約 ID>/Redline Data.json` から作り直し、送った `_vX.Y.Z_<自社名> Comments.docx` と比べる。
 
 - `word/document.xml`：同じ `--date` なら、バイト単位で一致する（2026-11-16 に確認）。
 - `word/comments.xml`：`w:date` と、`comment.py` が乱数で振る `w14:paraId`／`w14:textId` を除けば一致する。
