@@ -9,6 +9,6 @@ description: Part of Axla Legal, normally called from /axla-legal:loop. After th
 
 1. 変更履歴とコメントの入った .docx（redline.docx）を、Google ドライブのつながりの `create_file` で、Drive の契約フォルダに Google ドキュメントとして作る。名前は `<契約フォルダ名>_vX.Y.Z_<自社名> Comments`。
 2. 前に作った同じ版の gdoc があれば、ゴミ箱に移す（中身は新しい gdoc にある。リンクは変わる）。
-3. 記録する：`python3 -I ${CLAUDE_PLUGIN_ROOT}/scripts/gate.py mark <記録フォルダ> gdoc --id <作った gdoc の ID>`。
+3. 記録する：`python3 -I ${CLAUDE_PLUGIN_ROOT}/redline-contract/scripts/gate.py mark <記録フォルダ> gdoc --id <作った gdoc の ID>`。
 4. 代表に、gdoc のリンクと「何を変えたか」を3行で知らせて止まる（人間ゲート「最終 OK」）。
 5. 代表が「最終 OK」と言ったら `gate.py mark <記録フォルダ> approval`。直しを頼まれたら redline-contract に戻る（gdoc はまた最後に作り直す）。

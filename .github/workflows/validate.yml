@@ -21,7 +21,7 @@ jobs:
         run: |
           set -e
           found=0
-          for d in plugins/*/scripts/tests; do
+          for d in plugins/*/scripts/tests plugins/*/*/scripts/tests; do
             [ -d "$d" ] || continue
             found=1
             echo "== $d"

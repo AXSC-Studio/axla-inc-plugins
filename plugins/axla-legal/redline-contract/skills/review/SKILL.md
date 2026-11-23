@@ -5,7 +5,7 @@ description: Part of Axla Legal, normally called from /axla-legal:loop. Checks a
 
 # review（確かめる・内側のループ）
 
-道具：`${CLAUDE_PLUGIN_ROOT}/scripts`。指示文：[prompts/reviewer-prompts.md](${CLAUDE_PLUGIN_ROOT}/prompts/reviewer-prompts.md)（全文を読む）。
+道具：`${CLAUDE_PLUGIN_ROOT}/redline-contract/scripts`。指示文：[prompts/reviewer-prompts.md](${CLAUDE_PLUGIN_ROOT}/redline-contract/prompts/reviewer-prompts.md)（全文を読む）。
 
 1. 承諾後の本文を作る：`view.py <work> accept`。
 2. 参照を機械で確かめる：`check_refs.py <work> --out <W>/review-refs.md`。

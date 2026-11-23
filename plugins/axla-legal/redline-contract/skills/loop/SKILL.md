@@ -5,18 +5,18 @@ description: Use first for any contract work (an NDA or other contract arrived, 
 
 # loop（Axla Legal の入口）
 
-契約のループ（[spec](${CLAUDE_PLUGIN_ROOT}/specs/legal-001-run-contract-loop.md)）の入口。**自分で手順を選ばない。道具が決めた次の1歩だけをやる。**
+契約のループ（[spec](${CLAUDE_PLUGIN_ROOT}/redline-contract/specs/legal-001-run-contract-loop.md)）の入口。**自分で手順を選ばない。道具が決めた次の1歩だけをやる。**
 
 道具のフォルダ（Bash ではこの絶対パスを使う。`${CLAUDE_PLUGIN_ROOT}` は Bash の中では置き換わらない）：
-`${CLAUDE_PLUGIN_ROOT}/scripts`
+`${CLAUDE_PLUGIN_ROOT}/redline-contract/scripts`
 
 ## 手順
 1. 利用側のリポジトリに `loop/legal/` があるかを確かめる。無ければ止めて、置き場所を人に聞く。
 2. `loop/legal/LEGAL.md` を全文読む（書き換えない）。
 3. どの契約かを決める。
    - 人が契約 ID（例 `261123_NDA_1`）か相手の名前を言った → その契約。
-   - 言っていない → `python3 -I ${CLAUDE_PLUGIN_ROOT}/scripts/loop.py list` を走らせ、契約ごとの次の1歩を見せて、どれを進めるか聞く。新しい契約なら intake。
-4. `python3 -I ${CLAUDE_PLUGIN_ROOT}/scripts/loop.py next loop/legal/contracts/<契約 ID>` を走らせる。
+   - 言っていない → `python3 -I ${CLAUDE_PLUGIN_ROOT}/redline-contract/scripts/loop.py list` を走らせ、契約ごとの次の1歩を見せて、どれを進めるか聞く。新しい契約なら intake。
+4. `python3 -I ${CLAUDE_PLUGIN_ROOT}/redline-contract/scripts/loop.py next loop/legal/contracts/<契約 ID>` を走らせる。
 5. 表示された「次」の部品のスキルだけを使う：
    - `intake` → /axla-legal:intake
    - `redline-contract` → /axla-legal:redline-contract
@@ -29,5 +29,5 @@ description: Use first for any contract work (an NDA or other contract arrived, 
 
 ## 守ること
 - 送信・署名・LEGAL.md の外の判断（G1）・予算の数字は人が決める。代表がチャットで「最終 OK」「送った」「署名した」と言ったときだけ、`gate.py mark` で記録する。
-- 柵（Hook）が止めたら、回り道をしない。止めた理由を直す。直せなければ人に上げる（[guardrails](${CLAUDE_PLUGIN_ROOT}/docs/guardrails.md)）。
+- 柵（Hook）が止めたら、回り道をしない。止めた理由を直す。直せなければ人に上げる（[guardrails](${CLAUDE_PLUGIN_ROOT}/redline-contract/docs/guardrails.md)）。
 - 契約の本文・相手の名前は、git にも Issue にも書かない。

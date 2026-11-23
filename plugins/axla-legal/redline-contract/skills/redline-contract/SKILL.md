@@ -7,7 +7,7 @@ description: Part of Axla Legal, normally called from /axla-legal:loop. Writes y
 
 契約の仕事を最初から頼まれたときは、/axla-legal:loop から始める（いまどこかを道具が決める）。
 
-道具：`${CLAUDE_PLUGIN_ROOT}/scripts`（Bash ではこの絶対パスを使う。`${CLAUDE_PLUGIN_ROOT}` は Bash の中では置き換わらない）。手順の細部は [scripts/README.md](${CLAUDE_PLUGIN_ROOT}/scripts/README.md) の手順 1〜6。
+道具：`${CLAUDE_PLUGIN_ROOT}/redline-contract/scripts`（Bash ではこの絶対パスを使う。`${CLAUDE_PLUGIN_ROOT}` は Bash の中では置き換わらない）。手順の細部は [scripts/README.md](${CLAUDE_PLUGIN_ROOT}/redline-contract/scripts/README.md) の手順 1〜6。
 
 1. `loop/legal/LEGAL.md` を全文読む（書き換えない）。自社名・作成者名・登記上の本店・代表者は `loop/legal/config.json`（本店と代表者は任意。無ければ当事者の表示は G1 で聞く）（無ければ `templates/config.json` を写して埋めてもらうよう人に頼む）。
 2. 原本を作業フォルダに展開し、段落の ID を調べて、`<記録フォルダ>/Redline Data.json` に直しとコメントを書く（1往復で締結できる量に絞る）。

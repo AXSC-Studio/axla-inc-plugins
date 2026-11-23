@@ -11,6 +11,9 @@ Versions follow [Semantic Versioning](https://semver.org/). Every version bump a
 - One real contract has gone through the whole loop to Signed and the outer loop (tracking issue #31, step 6).
 - The listing information, privacy policy and icon are in place (#18, #23, #24).
 
+## 0.20.0
+- Feature folders, like Axla Marketing: everything for the contract loop moved under `redline-contract/` (skills, specs, scripts, hooks, prompts, docs, templates, examples, routines). `plugin.json` points to `./redline-contract/skills` and `./redline-contract/hooks/hooks.json`. Skill names do not change (`/axla-legal:loop` and the parts). Paths to tools inside the plugin now start with `redline-contract/`.
+
 ## 0.19.0
 - Fixes from the first full run on a fictional contract (#67): intake says where a downloaded original goes; `config.json` can hold the registered address and representative; `gate.py mark g1` / `g1_answered` and the entry stops on an open G1; review counts cycles with the version being sent; PDF checks need Word or LibreOffice.
 
@@ -88,6 +91,9 @@ Versions follow [Semantic Versioning](https://semver.org/). Every version bump a
 - `main` で CI が緑（テスト・`claude plugin validate --strict`・リポジトリの検査）。
 - 本物の契約1件が、署名（Signed）と外側のループまで、ループを1周した（まとめの #31 の6番目）。
 - 掲載の情報・プライバシーポリシー・アイコンがそろっている（#18・#23・#24）。
+
+## 0.20.0
+- Axla Marketing と同じく、機能ごとのフォルダにした：契約のループのものを `redline-contract/` の下に移した（skills・specs・scripts・hooks・prompts・docs・templates・examples・routines）。`plugin.json` は `./redline-contract/skills` と `./redline-contract/hooks/hooks.json` を指す。スキルの名前（`/axla-legal:loop` と部品）は変わらない。プラグインの中の道具のパスは `redline-contract/` から始まる。
 
 ## 0.19.0
 - 作り話の契約で通しの1周を回して見つかった所を直した（#67）：取り込んだ原本の置き場所、config.json の本店・代表者、`gate.py mark g1`／`g1_answered` と答えの出ていない G1 で止まる入口、送る版で周回を数える、PDF の目視に Word か LibreOffice が要る。
