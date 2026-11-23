@@ -17,6 +17,8 @@ Hook は下書きの検査で、これと下書きの修正点を比べる。
   1つでも入っていなければ止まる（照合）。
 - "internal": true を付けたコメント（社内だけの「検討中」など）は、メール本文にも照合にも入れない（社内 gdoc にだけ残る。清書では消える）。
 - メール本文の修正点は、この道具で作る。手で書かない。同じ JSON からは、毎回同じ出力になる。
+- HTML の最後に、画像の無い短い引用の枠を入れる（テンプレートの "quote_note" で文を変えられる）。下書きを作ったあと、
+  この HTML で update_draft すると、相手のメールの引用（画像入り）が付き直らない（Issue #12）。
 """
 import argparse
 import html
@@ -80,6 +82,12 @@ for head, reasons in items:
     h.append('<li>' + e(head[1:]) + ''.join(f'<br>（理由）{e(r)}' for r in reasons) + '</li>')
 h.append('</ul>')
 h.append('<div>' + '<br>'.join(e(l) for l in tpl['closing']) + '</div>')
+# 引用の枠（Issue #12）：スレッドの中の返信の下書きには、つながりが相手のメールを引用として付け、その中の画像が
+# 送信時に添付に変わる。下書きを作ったあと、この HTML で update_draft すると、引用の枠があるので相手のメールの
+# 引用は付き直らず、画像の無い短い枠だけが残る（2026-11-23 に確かめた）。スレッドの中の返信のままになる。
+quote_note = tpl.get('quote_note') or '（前のメールの引用は省略しました。同じスレッドでご覧いただけます。）'
+h.append('<br><div class="gmail_quote"><blockquote class="gmail_quote" '
+         'style="margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">' + e(quote_note) + '</blockquote></div>')
 open(args.out_html, 'w', encoding='utf-8').write('\n'.join(h) + '\n')
 if args.record:
     import os

@@ -11,6 +11,9 @@ Versions follow [Semantic Versioning](https://semver.org/). Every version bump a
 - One real contract has gone through the whole loop to Signed and the outer loop (tracking issue #31, step 6).
 - The listing information, privacy policy and icon are in place (#18, #23, #24).
 
+## 0.18.0
+- Reply drafts stay in the thread without quoted images: create the draft, then update it at once with the reply HTML, which ends in a short image-free quote block, so the connector does not re-add the original quote (#12).
+
 ## 0.17.2
 - Category is the department name (`legal`); owner and author URLs point to this repository; no `network` declaration (README lists the destinations) (#30).
 
@@ -82,6 +85,9 @@ Versions follow [Semantic Versioning](https://semver.org/). Every version bump a
 - `main` で CI が緑（テスト・`claude plugin validate --strict`・リポジトリの検査）。
 - 本物の契約1件が、署名（Signed）と外側のループまで、ループを1周した（まとめの #31 の6番目）。
 - 掲載の情報・プライバシーポリシー・アイコンがそろっている（#18・#23・#24）。
+
+## 0.18.0
+- 返信の下書きを、スレッドの中のまま、引用の画像なしにする：下書きを作ったら、すぐ返信文の HTML（最後に画像の無い短い引用の枠）で差し替える。枠があると、つながりは相手のメールの引用を付け直さない（#12）。
 
 ## 0.17.2
 - category を部署名（`legal`）にした。owner と author の URL を、このリポジトリにそろえた。`network` の宣言はしない（通信先は README の表に書く）（#30）。

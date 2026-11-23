@@ -110,7 +110,9 @@ python3 -I $T/make_clean.py $W/work --out $W/clean.docx --date <changes JSON の
 # 10. 返信メールの本文を作る（手で書かない）。下書きは、相手のメールのスレッドの中に作り、添付は代表が付ける
 #    --record で reply.txt の写しを $C に置く（Hook が下書きの検査で使う）
 python3 -I $T/make_reply.py "$C/Redline Data.json" --out-text $W/reply.txt --out-html $W/reply.html --record $C
-#    下書きを作ったら、本文の修正点の部分が reply.txt と1文字も違わないことを確かめる
+#    下書き：create_draft（replyToMessageId・body＝reply.txt・htmlBody＝reply.html・添付なし）のあと、
+#    すぐ同じ下書きを update_draft（htmlBody＝reply.html・body＝reply.txt）。reply.html の最後の短い引用の枠があるので、
+#    相手のメールの引用（画像入り）は付き直らず、スレッドの中の返信のまま画像が消える（Issue #12、2026-11-23 に確かめた）
 
 # 11. 送る前のゲート（下書き）：下書きを作ったら、Gmail のつながりの get_draft を messageFormat=RAW で呼ぶ。
 #    Hook がその結果をその場で検査し、gate.json に記録する（ファイルに写す手間は要らない。Issue #34）。
@@ -118,8 +120,9 @@ python3 -I $T/make_reply.py "$C/Redline Data.json" --out-text $W/reply.txt --out
 #    --record を付けると gate.json に記録される。下書きを作ったあと、これが OK になるまで Hook はターンを終わらせない
 python3 -I $T/check_draft.py <get_draft の結果のファイル> --expect-attachments 0 --reply $W/reply.txt --record $C
 #    返信の下書きには、コネクタが相手のメールを引用として足し、その中の署名ロゴやボタンの画像（<img>）も入る。
-#    送ると Gmail がそれを添付に変え、相手に意味のない画像が届く。本文を差し替えても引用は付き直すので、道具では消せない。
-#    → <img> や画像のパーツが残っていたら、代表に「Gmail の画面で引用部分（…）を消してから、清書を添付する」と頼む。
+#    送ると Gmail がそれを添付に変え、相手に意味のない画像が届く。引用の枠の無い本文で差し替えると引用は付き直るが、
+#    reply.html（引用の枠つき）で update_draft すれば付き直らない。
+#    → それでも <img> や画像のパーツが残っていたら、代表に「Gmail の画面で引用部分を消してから、清書を添付する」と頼む。
 #    代表が添付を付けて引用を消したら、送る直前にもう一度：--expect-attachments 1（契約書の1つだけ）で OK になること
 
 # 12. 送った後の確認：送信済みのメッセージ（get_message の RAW）を同じ道具で調べる
