@@ -75,7 +75,8 @@ class TestMakeClean(unittest.TestCase):
 
     def test_clean_without_settings(self):
         d = make_unpacked(self.root)
-        before = open(os.path.join(d, 'word/document.xml'), encoding='utf-8').read()
+        with open(os.path.join(d, 'word/document.xml'), encoding='utf-8') as f:
+            before = f.read()
         r = run('make_clean.py', d, '--out', self.out, '--date', '2026-01-01T00:00:00Z')
         self.assertEqual(r.returncode, 0, r.stderr)
         with zipfile.ZipFile(self.out) as z:
@@ -92,7 +93,8 @@ class TestMakeClean(unittest.TestCase):
         self.assertNotIn('Someone', core)
         self.assertIn('2026-01-01T00:00:00Z', core)
         # 元の展開済みフォルダは書き換えない
-        self.assertEqual(before, open(os.path.join(d, 'word/document.xml'), encoding='utf-8').read())
+        with open(os.path.join(d, 'word/document.xml'), encoding='utf-8') as f:
+            self.assertEqual(before, f.read())
 
     def test_same_input_same_bytes(self):
         d = make_unpacked(self.root, settings=True)
@@ -100,7 +102,8 @@ class TestMakeClean(unittest.TestCase):
         for o in (self.out, out2):
             r = run('make_clean.py', d, '--out', o, '--date', '2026-01-01T00:00:00Z')
             self.assertEqual(r.returncode, 0, r.stderr)
-        self.assertEqual(open(self.out, 'rb').read(), open(out2, 'rb').read())
+        with open(self.out, 'rb') as a, open(out2, 'rb') as b:
+            self.assertEqual(a.read(), b.read())
 
     def test_stops_and_leaves_no_file(self):
         # accept.py が扱わない変更履歴（移動）を入れる → 検査で止まり、前の清書も消える

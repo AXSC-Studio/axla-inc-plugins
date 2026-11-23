@@ -230,7 +230,7 @@ axla-inc-plugins/plugins/axla-legal/        … 道具（このプラグイン�
 
 - 入口で `gate.py watch` に相手の宛先・スレッド・メッセージを登録する。登録した相手へのメールは、AI からは送れない（送信は代表）。
 - 清書は `make_clean.py --record` で作る。この記録が無い、またはその後に `Redline Data.json` が変わったときは、下書きを作れない。
-- 下書きに `<img>` や添付があれば、作れない。下書きを作ったら、`check_draft.py --record` が OK になるまで、ターンを終われない。
+- 下書きに `<img>` や添付があれば、作れない。下書きを作ったら、get_draft を messageFormat=RAW で読む。Hook がその場で検査し（修正点が0行なら NG）、OK が記録されるまで、ターンを終われない。
 - 閉じた世界：中間ループの間の LEGAL.md の書き換え、`gate.json` の手書き、契約の記録の `git add` を止める。
 
 ## 柵：INCIDENT → 柵を1つ足す

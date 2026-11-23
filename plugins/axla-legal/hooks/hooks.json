@@ -11,7 +11,7 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "mcp__.*__(create_draft|update_draft)",
+        "matcher": "mcp__.*__(create_draft|update_draft|get_draft|get_message)",
         "hooks": [
           { "type": "command", "command": "python3 -I \"${CLAUDE_PLUGIN_ROOT}/hooks/guard.py\" post", "timeout": 10 }
         ]

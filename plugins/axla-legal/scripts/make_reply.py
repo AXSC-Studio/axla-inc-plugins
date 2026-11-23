@@ -1,7 +1,10 @@
 """changes JSON から、相手への返信メールの本文（プレーンテキストと HTML）を作る。
 
 使い方:
-    python -I make_reply.py <changes.json> --out-text reply.txt --out-html reply.html [--template template.json]
+    python -I make_reply.py <changes.json> --out-text reply.txt --out-html reply.html [--template template.json] [--record <契約の記録フォルダ>]
+
+--record を渡すと、プレーンテキストの写しを <記録フォルダ>/reply.txt に置く（git に入らない所）。
+Hook は下書きの検査で、これと下書きの修正点を比べる。
 
 - 「主な修正点」は、changes JSON の "reply"."items" から作る。各項目は
   {"article": "第1条（目的）", "summary": "何を直したか（1行）", "reasons": ["<comments の start の段落 ID>", ...]}
@@ -25,6 +28,7 @@ ap.add_argument('changes')
 ap.add_argument('--template', help='opening／closing を持つ JSON。省くと changes JSON の reply.template')
 ap.add_argument('--out-text', required=True)
 ap.add_argument('--out-html', required=True)
+ap.add_argument('--record', help='契約の記録フォルダ。reply.txt の写しをそこに置き、Hook が下書きの検査で使う')
 args = ap.parse_args()
 
 spec = json.load(open(args.changes, encoding='utf-8'))
@@ -77,4 +81,10 @@ for head, reasons in items:
 h.append('</ul>')
 h.append('<div>' + '<br>'.join(e(l) for l in tpl['closing']) + '</div>')
 open(args.out_html, 'w', encoding='utf-8').write('\n'.join(h) + '\n')
+if args.record:
+    import os
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import gate
+    open(os.path.join(args.record, 'reply.txt'), 'w', encoding='utf-8').write(text)
+    gate.update(args.record, 'reply', {'file': 'reply.txt', 'at': gate.now()})
 print(f'ok: items={len(items)} lines={len(lines)}')
