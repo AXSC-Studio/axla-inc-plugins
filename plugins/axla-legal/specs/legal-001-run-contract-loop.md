@@ -185,7 +185,7 @@ axla-inc-plugins/plugins/axla-legal/        … 道具（このプラグイン�
 
 | 出口 | いつ | 次 |
 |---|---|---|
-| **合格** | 致命的 0件（検証役の出力を `count_findings.py` で数え直して決める。件数が合わなければ、その検証役をもう一度回す） | 送る前のゲートへ。重要の指摘は、直すか、Loop Log の「戻されたときの用意」に回す |
+| **合格** | 致命的 0件（検証役の出力と `check_refs.py` の出力を `count_findings.py` で数え直して決める。参照の誤りは、検証役の付けた重さにかかわらず致命的。件数が合わなければ、その検証役をもう一度回す） | 送る前のゲートへ。重要の指摘は、直すか、Loop Log の「戻されたときの用意」に回す |
 | **人に聞く** | 事業の判断が要る論点（LEGAL.md の「G1 に上げる」） | G1。状態は「G1 待ち」 |
 | **予算切れ** | 下の「予算」の上限に来た（`budget.py check` が終了コード 3） | G1。状態は「予算切れ（どの上限か）」。例：`予算切れ（検証の周回（その送付の中））` |
 
@@ -321,4 +321,4 @@ axla-inc-plugins/plugins/axla-legal/        … 道具（このプラグイン�
 
 ## 検証役への指示文
 
-全文は [prompts/reviewer-prompts.md](../prompts/reviewer-prompts.md)（2.0.0）。この spec には写さない（版を一か所で管理するため）。
+全文は [prompts/reviewer-prompts.md](../prompts/reviewer-prompts.md)（2.1.0）。この spec には写さない（版を一か所で管理するため）。
