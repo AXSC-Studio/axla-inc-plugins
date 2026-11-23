@@ -8,9 +8,9 @@ description: Use to turn the Gemini notes (transcript) of a solo Google Meet int
 しゃべった熱が冷める前に、記事の下書きまで運ぶ。公開ボタンは人が押す。
 
 ## 最初に読むもの
-1. 決まり：`${CLAUDE_PLUGIN_ROOT}/specs/marketing-001-turn-meeting-into-article.md`
-2. 道具の使い方：`${CLAUDE_PLUGIN_ROOT}/scripts/README.md`
-3. 編集役・検証役の指示文：`${CLAUDE_PLUGIN_ROOT}/prompts/editor-prompts.md`
+1. 決まり：`${CLAUDE_PLUGIN_ROOT}/meeting-to-article/specs/001-turn-meeting-into-article.md`
+2. 道具の使い方：`${CLAUDE_PLUGIN_ROOT}/meeting-to-article/scripts/README.md`
+3. 編集役・検証役の指示文：`${CLAUDE_PLUGIN_ROOT}/meeting-to-article/prompts/editor-prompts.md`
 4. 利用側のデータ（いま開いているリポジトリの中）：`loop/marketing/meeting-to-article.json`・`loop/marketing/glossary.md`・`loop/marketing/tone/`（全文を読む。書き換えない）
 
 ## 守ること

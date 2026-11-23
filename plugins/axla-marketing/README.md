@@ -2,36 +2,28 @@
 
 **English** | [日本語](#日本語)
 
-When a topic comes to mind, talk about it alone in a Google Meet instead of writing notes. When you leave the meeting, the plugin turns the Gemini notes into a draft article and an eye-catch image. A person only presses "publish".
+Axla's marketing desk as a Claude Code plugin. Install it once and you get every marketing feature below. Each feature lives in its own folder with its skills, rules (specs), tools and prompts.
+
+| Feature | Skills | What it does | Status |
+|---|---|---|---|
+| [meeting-to-article](meeting-to-article/) | `/axla-marketing:meeting-to-article` | Turns the notes of a solo Google Meet into a draft article and an eye-catch image | Working |
+| [event-ops](event-ops/) | `/axla-marketing:plan-event` and three more | Runs an in-person event you host: launch, back-and-forth with venue and sponsors, the day, follow-up, and learning for the next one | Specs only |
 
 ```
-Talk alone in a Meet and leave
-  → a watcher (Apps Script) finds the notes by document ID
-  → a routine edits the talk into an article, and a reviewer checks it
-  → builds the eye-catch image and the draft JSON
-  → your own system puts it into your CMS as a draft and notifies you
-  → a person presses publish
+axla-marketing/
+├── .claude-plugin/plugin.json   ← one manifest for the department
+├── meeting-to-article/          ← feature: skills/ specs/ scripts/ prompts/
+└── event-ops/                   ← feature: skills/ specs/ scripts/ prompts/ hooks/
 ```
 
-## What is inside
-| Path | Contents |
-|---|---|
-| `skills/meeting-to-article/` | The skill (entry point) |
-| `specs/marketing-001-turn-meeting-into-article.md` | The rules |
-| `prompts/editor-prompts.md` | Instructions for the editor and the reviewer |
-| `scripts/` | The watcher Apps Script, the draft JSON, a text-only eye-catch |
+## Install
+```
+/plugin marketplace add AXSC-Studio/axla-inc-plugins
+/plugin install axla-marketing@axla-inc-plugins
+```
 
-## What you put in your repository
-Plugins contain tools only. Your data lives in the using repository under `loop/marketing/`.
-
-- `meeting-to-article.json`: meeting title, category, length, eye-catch colors and so on (example in `scripts/README.md`)
-- `glossary.md` (shared across marketing skills): fixes for common transcription errors
-- `tone/` (shared): sample articles whose tone you want to follow
-
-## Principles
-- Keep the energy of the talk. Edit, do not summarize. Never add what was not said.
-- Automate up to the draft. A person presses publish.
-- Do not rename or move the notes file (it is tracked by ID).
+## Where your data lives
+Plugins contain tools only. Your data lives in the using repository under `loop/marketing/` (event-ops uses `loop/marketing/event-ops/`).
 
 ## License
 MIT
@@ -40,36 +32,21 @@ MIT
 
 ## 日本語
 
-ふと浮かんだテーマを、メモにせず一人の Google Meet でしゃべる。退出したら、Gemini メモから記事の下書きとアイキャッチまで自動で作る。公開ボタンだけ人が押す。
+Axla のマーケティング部署を、Claude Code のプラグインにしたものです。1回入れると、下のマーケの機能がすべて使えます。機能は1つずつ自分のフォルダを持ち、その中にスキル・決まり（specs）・道具・指示文を置きます。
 
+| 機能 | スキル | 何をするか | 状態 |
+|---|---|---|---|
+| [meeting-to-article](meeting-to-article/) | `/axla-marketing:meeting-to-article` | 一人で話した Google Meet のメモを、記事の下書きとアイキャッチにする | 使える |
+| [event-ops](event-ops/) | `/axla-marketing:plan-event` ほか3つ | 自分で会場を借りて開くイベントを、立ち上げ・会場やスポンサーとのやりとり・当日・お礼・次回への学びまで回す | spec のみ |
+
+### 入れ方
 ```
-一人の Meet でしゃべって退出
-  → 見張り（Apps Script）がメモをドキュメント ID で見つける
-  → ルーティンが、しゃべりを編集して記事にし、検証役が見る
-  → アイキャッチと下書きの JSON を作る
-  → 利用側の仕組みで CMS に下書きとして入れ、通知する
-  → 人が公開を押す
+/plugin marketplace add AXSC-Studio/axla-inc-plugins
+/plugin install axla-marketing@axla-inc-plugins
 ```
 
-### 入っているもの
-| 場所 | 中身 |
-|---|---|
-| `skills/meeting-to-article/` | スキル（入口） |
-| `specs/marketing-001-turn-meeting-into-article.md` | 決まり |
-| `prompts/editor-prompts.md` | 編集役・検証役の指示文 |
-| `scripts/` | 見張りの Apps Script、下書きの JSON、文字だけのアイキャッチ |
-
-### 利用側に置くもの
-プラグインは道具だけです。データは、使う側のリポジトリの `loop/marketing/` に置きます。
-
-- `meeting-to-article.json`：Meet の題・カテゴリ・字数・アイキャッチの色など（例は `scripts/README.md`）
-- `glossary.md`（マーケのスキルで共有）：誤変換の直し方（例：「アスクの新築情報」→「axsc.me の新着情報」）
-- `tone/`（共有）：まねたい記事の見本
-
-### 大事にしていること
-- しゃべりの熱を残す。要約ではなく編集にする。言っていないことは足さない。
-- 下書きまでは任せる。公開は人が押す。
-- メモのファイルの名前や場所は変えない（ID で追う）。
+### データの置き場所
+プラグインは道具だけです。データは、使う側のリポジトリの `loop/marketing/` に置きます（event-ops は `loop/marketing/event-ops/`）。
 
 ### ライセンス
 MIT
