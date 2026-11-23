@@ -35,6 +35,8 @@ class TestGuard(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.root = self.tmp.name
         subprocess.run(['git', 'init', '-q', '-b', 'main', self.root], check=True)
+        with open(os.path.join(self.root, '.gitignore'), 'w') as f:
+            f.write('loop/legal/contracts/\n')
         self.legal = os.path.join(self.root, 'loop', 'legal')
         self.c = os.path.join(self.legal, 'contracts', '990101_NDA_1')
         os.makedirs(self.c)
@@ -150,6 +152,30 @@ class TestGuard(unittest.TestCase):
         self.assertTrue(denied(self.pre('Bash', {'command': 'git add loop/legal/contracts/990101_NDA_1/loop-log.md'})))
         self.assertTrue(denied(self.pre('Bash', {'command': 'git add -f loop/legal'})))
         self.assertIsNone(self.pre('Bash', {'command': 'git add loop/legal/register.csv && git commit -m x'}))
+        self.assertTrue(denied(self.pre('Bash', {'command': 'git add received/F_v0.1.0_Original.docx'})))
+
+    def git(self, *args):
+        return subprocess.run(['git', '-C', self.root, '-c', 'user.name=t', '-c', 'user.email=t@example.test', *args],
+                              capture_output=True, text=True)
+
+    def test_commit_with_staged_contract_file_is_denied(self):
+        # git add -A などで、除外に入っていない契約書が入ってしまった形
+        with open(os.path.join(self.root, 'F_v0.2.3_Axla Comments.docx'), 'wb') as f:
+            f.write(b'PK')
+        self.git('add', '-A')
+        out = self.pre('Bash', {'command': 'git commit -m "update"'})
+        self.assertTrue(denied(out))
+        self.assertIn('.docx', out['hookSpecificOutput']['permissionDecisionReason'])
+        self.git('rm', '-q', '--cached', 'F_v0.2.3_Axla Comments.docx')  # まだコミットの無いリポジトリなので rm --cached
+        self.assertIsNone(self.pre('Bash', {'command': 'git commit -m "update"'}))
+
+    def test_records_refused_when_not_ignored(self):
+        os.remove(os.path.join(self.root, '.gitignore'))
+        r = subprocess.run([sys.executable, '-I', GATE, 'watch', os.path.join(self.legal, 'contracts', '990102_NDA_2'),
+                            '--to', PARTNER], capture_output=True, text=True)
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn('.gitignore', r.stderr)
+        self.assertFalse(os.path.exists(os.path.join(self.legal, 'contracts', '990102_NDA_2', 'gate.json')))
 
 
 if __name__ == '__main__':
