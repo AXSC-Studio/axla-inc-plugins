@@ -1,8 +1,8 @@
 {
   "name": "axla-marketing",
   "displayName": "Axla Marketing",
-  "version": "0.4.0",
-  "description": "Axla's marketing desk: each feature in its own folder. meeting-to-article turns a solo Google Meet into a draft article; event-ops (specs only) runs an in-person event you host",
+  "version": "0.5.0",
+  "description": "Axla's marketing desk: each feature in its own folder. meeting-to-article turns a solo Google Meet into a draft article; event-ops runs an in-person event you host as a three-layer loop (plan-event first)",
   "author": {
     "name": "Axla Inc.",
     "url": "https://github.com/AXSC-Studio"
@@ -14,7 +14,8 @@
     "events"
   ],
   "skills": [
-    "./meeting-to-article/skills"
+    "./meeting-to-article/skills",
+    "./event-ops/skills"
   ],
   "hooks": "./event-ops/hooks/hooks.json"
 }

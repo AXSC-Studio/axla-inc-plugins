@@ -1,0 +1,16 @@
+{
+  "locale": "ja-JP",
+  "currency": "円",
+  "tax_rate": 0.10,
+  "region": "jp",
+  "approvers": ["self"],
+  "kit": ["event_page", "eyecatch", "overview", "sponsor_deck", "venue_layout"],
+  "max_rounds": 3,
+  "reply_wait_days": 3,
+  "settle_days": 14,
+  "lines_source": "plan.md",
+  "adapters": {"events": "manual", "docs": "manual", "email": "manual"},
+  "send_tools": [],
+  "pay_tools": [],
+  "allow_tools": []
+}
