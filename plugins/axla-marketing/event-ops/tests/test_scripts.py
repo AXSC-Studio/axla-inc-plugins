@@ -45,6 +45,10 @@ class CheckOutboundTest(unittest.TestCase):
         self.assertEqual(code, 1, out)
         self.assertIn("【要確認】", out)
 
+    def test_stale_draft_marker_fails(self):
+        code, out = run("check_outbound.py", "--names", str(self.d / "names.local"), "--to", "PT-001", self.write("【古い】 計画が変わった\n資料です"))
+        self.assertEqual(code, 1, out)
+
     def test_other_partner_name_fails(self):
         code, out = run("check_outbound.py", "--names", str(self.d / "names.local"), "--to", "PT-001", self.write("Sponsor Lead さんにも聞いています"))
         self.assertEqual(code, 1, out)

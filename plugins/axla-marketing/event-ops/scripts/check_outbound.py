@@ -15,7 +15,7 @@ import argparse
 import sys
 from pathlib import Path
 
-DEFAULT_MARKERS = ["【要確認】", "【社内】", "【TODO】", "【メモ】", "【仮】確認中", "TODO", "FIXME", "社内向け", "（社内）", "fail_code"]
+DEFAULT_MARKERS = ["【要確認】", "【古い】", "【社内】", "【TODO】", "【メモ】", "【仮】確認中", "TODO", "FIXME", "社内向け", "（社内）", "fail_code"]
 
 
 def read_names(path):
