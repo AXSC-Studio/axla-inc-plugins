@@ -1,0 +1,11 @@
+{
+  "_note": "利用側の loop/legal/budget.json の見本。数字は代表が決める（人間ゲート）。null は「上限なし」。inner_cycles_per_send の 5 は spec の今の決まり",
+  "limits": {
+    "inner_cycles_per_send": 5,
+    "round_trips": null,
+    "days_from_receipt": null,
+    "review_tokens": null,
+    "review_minutes": null,
+    "notify_retries": null
+  }
+}

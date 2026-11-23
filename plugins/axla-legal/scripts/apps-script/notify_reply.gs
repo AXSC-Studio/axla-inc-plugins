@@ -10,9 +10,13 @@
  * 設定（スクリプトのプロパティ。コードには書かない）
  *   ROUTINE_URL   … 見張りタスクの /fire の URL（タスク画面の API の欄に出る。代表が貼る）
  *   ROUTINE_TOKEN … claude.ai のタスク画面で発行した API の合鍵（代表が貼る）
+ *   MAX_RETRIES   … 起こすのに失敗してよい回数（予算。loop/legal/budget.json の notify_retries と同じ値）。
+ *                   貼らなければ「上限なし」（失敗したら次の1分でまた試す）。上限に来たら、そのスレッドは
+ *                   ラベル「Legal/通知失敗」に移して試すのをやめ、自分あてにメールで知らせる
  */
 const LABEL_NEW = 'Legal/返信あり';
 const LABEL_DONE = 'Legal/通知済み';
+const LABEL_FAILED = 'Legal/通知失敗';
 
 function checkReplies() {
   const props = PropertiesService.getScriptProperties();
@@ -20,6 +24,8 @@ function checkReplies() {
   const token = props.getProperty('ROUTINE_TOKEN');
   if (!ROUTINE_URL) throw new Error('ROUTINE_URL がスクリプトのプロパティにありません');
   if (!token) throw new Error('ROUTINE_TOKEN がスクリプトのプロパティにありません');
+  const maxRaw = props.getProperty('MAX_RETRIES');
+  const maxRetries = maxRaw ? parseInt(maxRaw, 10) : null; // null＝上限なし
 
   const labelNew = GmailApp.getUserLabelByName(LABEL_NEW) || GmailApp.createLabel(LABEL_NEW);
   const labelDone = GmailApp.getUserLabelByName(LABEL_DONE) || GmailApp.createLabel(LABEL_DONE);
@@ -41,10 +47,24 @@ function checkReplies() {
     if (code >= 200 && code < 300) {
       thread.removeLabel(labelNew);
       thread.addLabel(labelDone);
+      props.deleteProperty('fail_' + thread.getId());
       console.log('fired: ' + thread.getId() + ' ' + res.getContentText());
     } else {
-      // 失敗したらラベルを残し、次の1分でもう一度試す
-      console.error('fire failed ' + code + ': ' + res.getContentText());
+      // 失敗したらラベルを残し、次の1分でもう一度試す。上限（MAX_RETRIES）に来たら止めて知らせる
+      const key = 'fail_' + thread.getId();
+      const fails = parseInt(props.getProperty(key) || '0', 10) + 1;
+      props.setProperty(key, String(fails));
+      console.error('fire failed ' + code + ' (' + fails + '/' + (maxRetries === null ? '上限なし' : maxRetries) + '): ' + res.getContentText());
+      if (maxRetries !== null && fails >= maxRetries) {
+        const labelFailed = GmailApp.getUserLabelByName(LABEL_FAILED) || GmailApp.createLabel(LABEL_FAILED);
+        thread.removeLabel(labelNew);
+        thread.addLabel(labelFailed);
+        props.deleteProperty(key);
+        // 本文はスレッド ID と回数だけ（メールの中身は書かない）
+        MailApp.sendEmail(Session.getEffectiveUser().getEmail(), 'Legal：予算切れ（自動検知の再試行）',
+          '見張りタスクを ' + fails + ' 回起こせなかったので、試すのをやめた。\nthread_id=' + thread.getId() +
+          '\nラベル「' + LABEL_FAILED + '」のスレッドを人が見て、見張りタスクを手で起こす。');
+      }
     }
   });
 }

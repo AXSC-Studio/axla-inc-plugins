@@ -20,6 +20,7 @@
 | `resolve_comments.py` | gdoc の開いているコメントを「解決済み」にする（消さない）。.docx を gdoc に取り込み直す前に使う |
 | `make_loop_log.py` | Loop Log を gdoc にしていたときの道具（JSON から HTML を作る）。いまの Loop Log は `loop/legal/contracts/<契約 ID>/loop-log.md` に直接書くので、付録（境目の版と最新の直しの違う段落）を作りたいときだけ使う |
 | `gate.py` | 契約ごとのゲートの記録（`$C/gate.json`）を読み書きする。入口で相手の宛先・スレッド・メッセージを登録する（`watch`）。Hook（`hooks/guard.py`）はこの記録で、送信・下書き・LEGAL.md の書き換えなどを止める（[docs/guardrails.md](../docs/guardrails.md)） |
+| `budget.py` | 予算（回数・日数・トークン・時間の上限）。上限は利用側の `loop/legal/budget.json`（無ければ「上限なし」）。`cycle` で内側のループの周回を数え、`check` が予算切れなら終了コード 3 で止まる |
 | `tests/` | 作り話の契約書で、道具と柵が止める例と通る例を確かめるテスト |
 | `apps-script/notify_reply.gs` | 入口の自動検知（試運転）。Gmail のラベル「Legal/返信あり」のスレッドを1分ごとに見つけ、クラウドの見張りタスクを起こす（本文はスレッド ID だけ）。くわしくは specs/legal-001 の「入口の自動検知（試運転）」 |
 
@@ -71,6 +72,9 @@ $W/venv/bin/python $T/add_comments.py $W/work "$C/Redline Data.json" --comment-p
 # 5. 再圧縮して、形式を検査する
 (cd $W/work && zip -qXrDy ../redline.docx .)
 $W/venv/bin/python $SK/office/validate.py $W/redline.docx --original $W/original.docx --author "Analy┊Axla Inc."
+
+#    内側のループを1周回すたびに数える（その送付の中＝Y が同じ間で数える）。予算切れなら終了コード 3 → 司令塔に上げる
+python3 -I $T/budget.py cycle $C --version vX.Y.Z && python3 -I $T/budget.py check $C
 
 # 6. 確認する：変更のある段落と、承諾後の本文
 python3 -I $T/view.py $W/work changed
