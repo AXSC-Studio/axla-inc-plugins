@@ -4,6 +4,19 @@
 
 A Claude Code plugin that runs a contract you received (starting with NDAs) from intake, through your own redline and the back-and-forth with the other party, up to signature.
 
+Axla's legal desk as a Claude Code plugin. Install it once and you get every legal feature below. Each feature lives in its own folder with its skills, rules (specs), tools, prompts and hooks. More features will be added next to `redline-contract`.
+
+| Feature | Skills | What it does | Status |
+|---|---|---|---|
+| [redline-contract](redline-contract/) | `/axla-legal:loop` (entry) and the parts `intake`, `redline-contract`, `review`, `gdoc`, `send`, `learn` | Runs a contract you received from intake to signature, with tracked changes, reviewers and pre-send guardrails | Working |
+
+```
+axla-legal/
+├── .claude-plugin/plugin.json   ← one manifest for the department
+├── README.md  PRIVACY.md  CHANGELOG.md  LICENSE
+└── redline-contract/            ← feature: skills/ specs/ scripts/ prompts/ hooks/ docs/ templates/ examples/ routines/
+```
+
 ## What it does
 - Puts your proposed changes into the other party's .docx as tracked changes (insertions and deletions), with a Word comment explaining each change
 - Checks the redline before sending, using internal reviewers with four viewpoints: your lawyer, the other party's legal team, formatting, and generative-AI clauses
@@ -29,7 +42,7 @@ A Claude Code plugin that runs a contract you received (starting with NDAs) from
 | Your Google Drive (connector) | Reads the original; creates the internal Google Doc | Review by your CEO or legal owner |
 | Your Gmail (connector) | Creates and reads reply drafts | Sending is always done by a person |
 | Google Drive API (optional) | `resolve_comments.py`, with your own `gcloud` token | Only when fixing an existing Google Doc |
-| Your Claude routine (optional, experimental) | `notify_reply.gs` sends a Gmail thread ID only | Wakes a read-only watcher when a reply arrives ([routines/reply-watcher.md](routines/reply-watcher.md)). Uses a beta API and may stop working without notice |
+| Your Claude routine (optional, experimental) | `notify_reply.gs` sends a Gmail thread ID only | Wakes a read-only watcher when a reply arrives ([routines/reply-watcher.md](redline-contract/routines/reply-watcher.md)). Uses a beta API and may stop working without notice |
 
 Hooks run locally. Nothing is sent to Axla Inc. Details: [PRIVACY.md](PRIVACY.md).
 
@@ -39,22 +52,22 @@ Hooks run locally. Nothing is sent to Axla Inc. Details: [PRIVACY.md](PRIVACY.md
 - Delete the work folder after each round (`rm -rf "$W"`), and the record folder when the contract no longer needs it.
 
 ## Troubleshooting
-- **"loop/legal/contracts/ is not git-ignored"**: add the line from `templates/gitignore.txt` to your `.gitignore`.
-- **"No author name"**: copy `templates/config.json` to `loop/legal/config.json` and fill in your values.
+- **"loop/legal/contracts/ is not git-ignored"**: add the line from `redline-contract/templates/gitignore.txt` to your `.gitignore`.
+- **"No author name"**: copy `redline-contract/templates/config.json` to `loop/legal/config.json` and fill in your values.
 - **A hook blocked an action**: read the reason; it names the missing check (clean copy, draft check, …). Run that step instead of working around it.
 - **`${CLAUDE_PLUGIN_ROOT}` is empty in a shell**: it is only expanded inside skills; use the absolute path shown by the skill.
 - **The draft check never runs**: read the draft with `get_draft` and `messageFormat=RAW`; the hook checks it.
 
 ## How to use
 1. Install (above)
-2. In the repository where you will use it, create `loop/legal/` and put your own rules `LEGAL.md` and your ledger `register.csv` there (columns are in [docs/register.md](docs/register.md))
+2. In the repository where you will use it, create `loop/legal/` and put your own rules `LEGAL.md` and your ledger `register.csv` there (columns are in [docs/register.md](redline-contract/docs/register.md))
 3. Add one line to that repository's `.gitignore`: `loop/legal/contracts/` (the tools stop if it is missing)
 4. Type `/axla-legal:loop` (or ask "Please review this contract"). The entry reads where each contract stands and runs only the next step: `intake` → `redline-contract` → `review` → `gdoc` → `send` → `learn`. It stops and tells you when it is waiting for a person (final OK, sending, signing)
 
 Contract text and per-contract records never go into this plugin or into git. Sending, signing and any decision outside your rules are always done by a person.
 
 ## Try it in 5 minutes (no Google account needed)
-`examples/` has a fictional NDA between two made-up companies, a sample redline (`Redline Data.json`) and a sample reviewer output. In a terminal, with `T` set to this plugin's `scripts` folder and `E` to its `examples` folder:
+`redline-contract/examples/` has a fictional NDA between two made-up companies, a sample redline (`Redline Data.json`) and a sample reviewer output. In a terminal, with `T` set to the plugin's `redline-contract/scripts` folder and `E` to its `redline-contract/examples` folder:
 
 ```bash
 W=$(mktemp -d)
@@ -68,7 +81,7 @@ python3 -I "$T/make_clean.py" "$W/work" --out "$W/clean.docx"       # the clean 
 python3 -I "$T/make_reply.py" "$E/Redline Data.json" --out-text "$W/reply.txt" --out-html "$W/reply.html"
 ```
 
-Templates for your own repository are in `templates/` (`LEGAL.md`, `register.csv`, `config.json` with your company name and the author name for tracked changes, and the `.gitignore` line). Nothing in the plugin is tied to one company.
+Templates for your own repository are in `redline-contract/templates/` (`LEGAL.md`, `register.csv`, `config.json` with your company name and the author name for tracked changes, and the `.gitignore` line). Nothing in the plugin is tied to one company.
 
 ## Example prompts
 - "An NDA arrived from a new partner. `/axla-legal:loop`" — starts intake, then the redline and review.
@@ -76,7 +89,7 @@ Templates for your own repository are in `templates/` (`LEGAL.md`, `register.csv
 - "I gave the final OK. Prepare the reply draft and check it before I send." — builds the clean copy and reply, then runs the pre-send check (sending stays with you).
 
 ## Guardrails (hooks)
-The plugin ships hooks that stop, instead of just asking: sending mail to a contract counterparty, creating a reply draft before the clean-copy check passes or with images or attachments, ending the turn before the draft check passes, editing `LEGAL.md` during a deal, and adding contract records to git. Details and a sample for your repository's settings: [docs/guardrails.md](docs/guardrails.md).
+The plugin ships hooks that stop, instead of just asking: sending mail to a contract counterparty, creating a reply draft before the clean-copy check passes or with images or attachments, ending the turn before the draft check passes, editing `LEGAL.md` during a deal, and adding contract records to git. Details and a sample for your repository's settings: [docs/guardrails.md](redline-contract/docs/guardrails.md).
 
 ## Changes and releases
 See [CHANGELOG.md](CHANGELOG.md), including the conditions for 1.0.0.
@@ -89,6 +102,19 @@ MIT
 ## 日本語
 
 相手から届いた契約書（まず NDA）を、Claude Code で「受け取り → 自社の直し → 相手との往復 → 署名」まで回すためのプラグインです。
+
+Axla の法務を、Claude Code のプラグインにしたものです。1回入れれば、下の法務の機能がすべて使えます。機能ごとに1つのフォルダを持ち、その中にスキル・決まり（spec）・道具・指示文・柵（Hook）を置きます。これから、`redline-contract` の隣に機能が増えていきます。
+
+| 機能 | スキル | 何をするか | 状態 |
+|---|---|---|---|
+| [redline-contract](redline-contract/) | 入口 `/axla-legal:loop` と、部品 `intake`・`redline-contract`・`review`・`gdoc`・`send`・`learn` | 届いた契約書を、受け取りから署名まで回す。変更履歴・検証役・送る前の柵つき | 動く |
+
+```
+axla-legal/
+├── .claude-plugin/plugin.json   ← 部署で1つの設定
+├── README.md  PRIVACY.md  CHANGELOG.md  LICENSE
+└── redline-contract/            ← 機能：skills/ specs/ scripts/ prompts/ hooks/ docs/ templates/ examples/ routines/
+```
 
 ### できること
 - 相手の .docx に、自社の修正案を変更履歴（挿入・削除）として入れ、修正ごとの理由を Word のコメントとして付ける
@@ -115,7 +141,7 @@ MIT
 | あなたの Google ドライブ（つながり） | 原本を読む。社内用の Google ドキュメントを作る | 代表や法務の担当が見るため |
 | あなたの Gmail（つながり） | 返信の下書きを作って読む | 送信は必ず人が押す |
 | Google ドライブの API（任意） | `resolve_comments.py`（あなた自身の `gcloud` のトークン） | 前からある Google ドキュメントを直すときだけ |
-| あなたの Claude のルーティン（任意・試験中） | `notify_reply.gs` が Gmail のスレッド ID だけを送る | 返事が来たら、読むだけの見張りを起こすため（[routines/reply-watcher.md](routines/reply-watcher.md)）。beta の API を使うので、予告なく動かなくなることがある |
+| あなたの Claude のルーティン（任意・試験中） | `notify_reply.gs` が Gmail のスレッド ID だけを送る | 返事が来たら、読むだけの見張りを起こすため（[routines/reply-watcher.md](redline-contract/routines/reply-watcher.md)）。beta の API を使うので、予告なく動かなくなることがある |
 
 Hook は手元だけで動きます。Axla Inc. には何も送りません。くわしくは [PRIVACY.md](PRIVACY.md)。
 
@@ -125,22 +151,22 @@ Hook は手元だけで動きます。Axla Inc. には何も送りません。�
 - 往復ごとに作業フォルダを消す（`rm -rf "$W"`）。契約が要らなくなったら、記録フォルダも消す。
 
 ### 困ったとき
-- **「loop/legal/contracts/ が git の除外に入っていない」**：`templates/gitignore.txt` の1行を `.gitignore` に足す。
-- **「作成者名がない」**：`templates/config.json` を `loop/legal/config.json` に写して、自社の値を書く。
+- **「loop/legal/contracts/ が git の除外に入っていない」**：`redline-contract/templates/gitignore.txt` の1行を `.gitignore` に足す。
+- **「作成者名がない」**：`redline-contract/templates/config.json` を `loop/legal/config.json` に写して、自社の値を書く。
 - **Hook に止められた**：理由を読む。足りない確認（清書・下書きの検査 …）の名前が出ているので、回り道をせず、その手順をやる。
 - **シェルで `${CLAUDE_PLUGIN_ROOT}` が空**：スキルの中でしか置き換わらない。スキルに出ている絶対パスを使う。
 - **下書きの検査が走らない**：`get_draft` を `messageFormat=RAW` で読む。Hook が検査する。
 
 ### 使い方
 1. 入れる（上の「入れ方」）
-2. 使う側のリポジトリに `loop/legal/` を作り、自社の決まり `LEGAL.md` と台帳 `register.csv` を置く（列は [docs/register.md](docs/register.md)）
+2. 使う側のリポジトリに `loop/legal/` を作り、自社の決まり `LEGAL.md` と台帳 `register.csv` を置く（列は [docs/register.md](redline-contract/docs/register.md)）
 3. そのリポジトリの `.gitignore` に `loop/legal/contracts/` の1行を足す（無いと道具が止まる）
 4. `/axla-legal:loop` と打つ（または「この契約書を見て」と頼む）。入口が契約ごとにいまどこかを読み、次の1歩だけを進める：`intake` → `redline-contract` → `review` → `gdoc` → `send` → `learn`。人を待つ所（最終 OK・送信・署名）では止まって知らせる
 
 契約書の本文と契約ごとの記録は、このプラグインにも git にも入れません。送信・署名・決まりの外の判断は、必ず人が行います。
 
 ### 5分で試す（Google のアカウントは要らない）
-`examples/` に、架空の会社どうしのダミーの NDA、直しの見本（`Redline Data.json`）、検証役の出力の見本があります。端末で、`T` にこのプラグインの `scripts` フォルダ、`E` に `examples` フォルダを入れて：
+`redline-contract/examples/` に、架空の会社どうしのダミーの NDA、直しの見本（`Redline Data.json`）、検証役の出力の見本があります。端末で、`T` にこのプラグインの `redline-contract/scripts` フォルダ、`E` に `redline-contract/examples` フォルダを入れて：
 
 ```bash
 W=$(mktemp -d)
@@ -154,7 +180,7 @@ python3 -I "$T/make_clean.py" "$W/work" --out "$W/clean.docx"       # 相手に�
 python3 -I "$T/make_reply.py" "$E/Redline Data.json" --out-text "$W/reply.txt" --out-html "$W/reply.html"
 ```
 
-自社のリポジトリに置くひな形は `templates/` にあります（`LEGAL.md`・`register.csv`・自社名と変更履歴の作成者名を書く `config.json`・`.gitignore` の1行）。プラグインの中に、特定の会社の決め打ちはありません。
+自社のリポジトリに置くひな形は `redline-contract/templates/` にあります（`LEGAL.md`・`register.csv`・自社名と変更履歴の作成者名を書く `config.json`・`.gitignore` の1行）。プラグインの中に、特定の会社の決め打ちはありません。
 
 ### 例のプロンプト
 - 「新しい取引先から NDA が届いた。`/axla-legal:loop`」：受け取りから始め、直しと検証へ進む。
@@ -162,7 +188,7 @@ python3 -I "$T/make_reply.py" "$E/Redline Data.json" --out-text "$W/reply.txt" -
 - 「最終 OK を出した。返信の下書きを作って、送る前に確かめて」：清書と返信文を作り、送る前の検査を通す（送信はあなたが押す）。
 
 ### 柵（Hook）
-頼むだけでなく、道具で止めます。契約の相手へのメールの送信、清書の検査が通る前や画像・添付のある返信の下書き、下書きの確認が通る前にターンを終えること、中間ループの間の `LEGAL.md` の書き換え、契約の記録の `git add` を止めます。くわしくと、利用側の設定の見本は [docs/guardrails.md](docs/guardrails.md)。
+頼むだけでなく、道具で止めます。契約の相手へのメールの送信、清書の検査が通る前や画像・添付のある返信の下書き、下書きの確認が通る前にターンを終えること、中間ループの間の `LEGAL.md` の書き換え、契約の記録の `git add` を止めます。くわしくと、利用側の設定の見本は [docs/guardrails.md](redline-contract/docs/guardrails.md)。
 
 ### 変更履歴とリリース
 [CHANGELOG.md](CHANGELOG.md)（1.0.0 を出す条件も）。

@@ -8,7 +8,7 @@
    / marketplace.json のプラグインの項目に version があれば落とす。
    If the plugin has a CHANGELOG.md, the new version must have a "## X.Y.Z" entry. / 変更履歴があるプラグインは、新しい版の見出しが要る。
 3. No contract files: *.docx, *.pdf, *.zip, "Redline Data.json" or a contracts/ folder anywhere in the repository,
-   except the fictional samples under plugins/*/examples/. / 契約ファイルが混ざっていたら落とす（見本の置き場所は除く）。
+   except the fictional samples under plugins/*/examples/ or plugins/*/<feature>/examples/. / 契約ファイルが混ざっていたら落とす（見本の置き場所は除く）。
 """
 import json
 import re
@@ -52,7 +52,7 @@ def main():
             errors.append(f'marketplace.json: "{e.get("name")}" has a version; keep it only in plugin.json / version は plugin.json だけ')
 
     for f in git('ls-files').split('\n'):
-        if not f or re.match(r'^plugins/[^/]+/examples/', f):
+        if not f or re.match(r'^plugins/[^/]+/([^/]+/)?examples/', f):
             continue
         if re.search(r'\.(docx|pdf|zip)$', f, re.I) or f.endswith('Redline Data.json') or re.search(r'(^|/)contracts/', f):
             errors.append(f'{f}: looks like a contract file / 契約ファイルらしい')

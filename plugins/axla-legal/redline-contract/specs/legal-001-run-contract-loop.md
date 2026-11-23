@@ -175,11 +175,14 @@ Legal/
 ## git の構成
 
 ```
-axla-inc-plugins/plugins/axla-legal/        … 道具（このプラグイン。どの会社でも使える部分だけ）
-├── scripts/                       … 道具（README に手順）
-├── prompts/reviewer-prompts.md    … 検証役への指示文（SemVer）
-├── specs/legal-001-…              … この決まり
-└── docs/register.md               … 台帳の列と数え方
+axla-inc-plugins/plugins/axla-legal/        … 部署のプラグイン（Axla Legal）。機能ごとのフォルダを持つ
+└── redline-contract/                … この機能（契約のループ）。どの会社でも使える部分だけ
+    ├── skills/                      … 入口 loop と部品（intake・redline-contract・review・gdoc・send・learn）
+    ├── scripts/                     … 道具（README に手順）
+    ├── hooks/                       … 柵
+    ├── prompts/reviewer-prompts.md  … 検証役への指示文（SemVer）
+    ├── specs/legal-001-…            … この決まり
+    └── docs/register.md             … 台帳の列と数え方
 
 <利用側のリポジトリ>/loop/legal/      … 使う会社のデータ（例：Axla Inc. では axla-inc リポジトリの loop/legal/）。自社名・作成者名などは config.json
 ├── LEGAL.md                       … Legal の決まり（開発の CLAUDE.md と同じ立ち位置）。版は世代 X。NDA は中の章。子セッションは毎回全文を読む（RAG ではない）
