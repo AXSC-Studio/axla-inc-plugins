@@ -5,7 +5,7 @@
   "name": "axla-inc-plugins",
   "owner": {
     "name": "Axla Inc.",
-    "url": "https://github.com/AXSC-Studio"
+    "url": "https://github.com/AXSC-Studio/axla-inc-plugins"
   },
   "metadata": {
     "description": "Claude Code plugins by Axla Inc. for running an AI-native company"
@@ -14,7 +14,7 @@
     {
       "name": "axla-legal",
       "source": "./plugins/axla-legal",
-      "category": "back-office",
+      "category": "legal",
       "keywords": [
         "legal",
         "contract",

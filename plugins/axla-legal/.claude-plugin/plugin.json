@@ -1,11 +1,11 @@
 {
   "name": "axla-legal",
   "displayName": "Axla Legal",
-  "version": "0.17.1",
+  "version": "0.17.2",
   "description": "Axla's legal desk for Japanese-language contracts (.docx) and Japanese business practice: redline the other party's contract with tracked changes and comments, check it with reviewers and tools, and run the back-and-forth to signature. Unlike a general legal-review plugin, it edits the .docx itself and keeps the pre-send checks as hooks.",
   "author": {
     "name": "Axla Inc.",
-    "url": "https://github.com/AXSC-Studio"
+    "url": "https://github.com/AXSC-Studio/axla-inc-plugins"
   },
   "homepage": "https://github.com/AXSC-Studio/axla-inc-plugins/tree/main/plugins/axla-legal",
   "repository": "https://github.com/AXSC-Studio/axla-inc-plugins",

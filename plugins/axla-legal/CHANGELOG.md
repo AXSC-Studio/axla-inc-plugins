@@ -11,6 +11,9 @@ Versions follow [Semantic Versioning](https://semver.org/). Every version bump a
 - One real contract has gone through the whole loop to Signed and the outer loop (tracking issue #31, step 6).
 - The listing information, privacy policy and icon are in place (#18, #23, #24).
 
+## 0.17.2
+- Category is the department name (`legal`); owner and author URLs point to this repository; no `network` declaration (README lists the destinations) (#30).
+
 ## 0.17.1
 - Small fixes from #30: `GOOGLE_ACCESS_TOKEN` instead of `T` and a timeout in `resolve_comments.py`; the changes JSON format is now named `axla-legal/changes v1` (the old name is still read); the spec's version wording follows vX.Y.Z; the entry skill says it is for Japanese .docx contracts and when not to use it.
 
@@ -79,6 +82,9 @@ Versions follow [Semantic Versioning](https://semver.org/). Every version bump a
 - `main` で CI が緑（テスト・`claude plugin validate --strict`・リポジトリの検査）。
 - 本物の契約1件が、署名（Signed）と外側のループまで、ループを1周した（まとめの #31 の6番目）。
 - 掲載の情報・プライバシーポリシー・アイコンがそろっている（#18・#23・#24）。
+
+## 0.17.2
+- category を部署名（`legal`）にした。owner と author の URL を、このリポジトリにそろえた。`network` の宣言はしない（通信先は README の表に書く）（#30）。
 
 ## 0.17.1
 - #30 の小さな直し：`resolve_comments.py` のトークンを `T` から `GOOGLE_ACCESS_TOKEN` にし、待ち時間の上限を付けた。changes JSON の形式名を `axla-legal/changes v1` にした（旧名も読める）。spec の版の書き方を vX.Y.Z にそろえた。入口のスキルに、日本語の .docx 向けであることと、使わない場面を書いた。
