@@ -8,8 +8,11 @@
 2. 変更をすべて反映する（accept.py と同じ。取り消し線は残らない）。
 3. コメントを外す（本文の範囲の印と参照、comments*.xml などの部品、その関係づけと Content_Types の登録）。
 4. 作成者などの情報を消す（core.xml の作成者・最終更新者・表題・件名・キーワード・説明・分類・最終印刷日、
-   app.xml の会社・管理者、custom.xml の独自のプロパティ）。core.xml の更新日時は --date にする。
-5. 清書になっているかを自分で確かめる（変更履歴 0・コメントの印と部品 0・隠し文字 0・作成者などの情報が空）。
+   app.xml の会社・管理者、custom.xml の独自のプロパティ）。core.xml の作成日時と更新日時は --date にする。
+   付随の情報も消す：customXml（相手の社内システムの情報）・サムネイル・テンプレートのパス・文書の変数（docVars）・rsid。
+   コメントの印は、本文・ヘッダー・フッター・脚注・文末脚注のすべてから外す。
+5. 清書になっているかを自分で確かめる（変更履歴 0・コメントの印と部品 0・隠し文字 0・w:author 0・付随の情報 0・作成者などの情報が空）。
+   迷ったら止める。
 6. 通ったときだけ、--out に .docx を書く（同じ入力と --date なら、バイト単位で同じファイルになる）。
 7. --record を渡すと、契約の gate.json の clean に「通った・清書の sha256・時刻」を書く。
    Hook は、この記録が無いと、その契約の返信の下書きを作らせない。
@@ -35,6 +38,7 @@ REVISION = re.compile(r'<w:(ins|del|moveFrom|moveTo|moveFromRangeStart|moveToRan
                       r'rPrChange|pPrChange|sectPrChange|tblPrChange|tblGridChange|tcPrChange|trPrChange|numberingChange)\b')
 COMMENT_MARK = re.compile(r'<w:comment(?:RangeStart|RangeEnd|Reference)\b')
 HIDDEN = re.compile(r'<w:vanish\b')
+AUTHOR = re.compile(r'\bw:author=')
 CORE_TAGS = ['dc:title', 'dc:subject', 'dc:creator', 'cp:keywords', 'dc:description', 'cp:lastModifiedBy', 'cp:category']
 FIXED_TIME = (1980, 1, 1, 0, 0, 0)
 
@@ -57,8 +61,40 @@ def strip_comment_marks(x):
     return x
 
 
+def is_custom_xml(path):
+    return path.split('/')[0].lower() == 'customxml'
+
+
+def strip_rsid(x):
+    return re.sub(r'\s+w:rsid\w*="[0-9A-Fa-f]*"', '', x)
+
+
 def clean(d, date):
-    rw(d, 'word/document.xml', strip_comment_marks)
+    for path in files_of(d):
+        if BODY_PART.match(path):
+            rw(d, path, lambda t: strip_rsid(strip_comment_marks(t)))
+    # 付随の情報：相手の社内システムの情報（customXml）・サムネイル・テンプレートのパス・文書の変数・rsid
+    for path in files_of(d):
+        if is_custom_xml(path) or re.match(r'^docProps/thumbnail\.', path):
+            os.remove(os.path.join(d, path))
+    for root, dirs, _ in os.walk(d, topdown=False):
+        for name in dirs:
+            p = os.path.join(root, name)
+            if not os.listdir(p):
+                os.rmdir(p)
+    drop_rel = r'<Relationship [^>]*Target="[^"]*(?:[Cc]ustom[Xx][Mm][Ll]/|thumbnail\.)[^"]*"[^>]*/>'
+    rw(d, '_rels/.rels', lambda t: re.sub(drop_rel, '', t))
+    rw(d, 'word/_rels/document.xml.rels', lambda t: re.sub(drop_rel, '', t))
+    rw(d, '[Content_Types].xml', lambda t: re.sub(r'<Override [^>]*PartName="/(?:[Cc]ustom[Xx][Mm][Ll]/|docProps/thumbnail\.)[^"]*"[^>]*/>', '', t))
+
+    def clean_settings(t):
+        t = re.sub(r'<w:rsids>.*?</w:rsids>', '', t, flags=re.S)
+        t = re.sub(r'<w:attachedTemplate\b[^>]*/>', '', t)
+        t = re.sub(r'<w:docVars>.*?</w:docVars>', '', t, flags=re.S)
+        return strip_rsid(t)
+
+    rw(d, 'word/settings.xml', clean_settings)
+    rw(d, 'word/_rels/settings.xml.rels', lambda t: re.sub(r'<Relationship [^>]*attachedTemplate[^>]*/>', '', t))
     for name in COMMENT_PARTS:
         p = os.path.join(d, 'word', name)
         if os.path.exists(p):
@@ -73,7 +109,7 @@ def clean(d, date):
         t = re.sub(r'<cp:lastPrinted>[^<]*</cp:lastPrinted>', '', t)
         t = re.sub(r'<cp:revision>[^<]*</cp:revision>', '<cp:revision>1</cp:revision>', t)
         if date:
-            t = re.sub(r'(<dcterms:modified [^>]*>)[^<]*(</dcterms:modified>)', r'\g<1>' + date + r'\2', t)
+            t = re.sub(r'(<dcterms:(?:modified|created) [^>]*>)[^<]*(</dcterms:(?:modified|created)>)', r'\g<1>' + date + r'\2', t)
         return t
 
     rw(d, 'docProps/core.xml', clean_core)
@@ -95,12 +131,28 @@ def verify(d):
     for path in files_of(d):
         if BODY_PART.match(path):
             x = read(d, path)
-            for label, pat in [('変更履歴', REVISION), ('コメントの印', COMMENT_MARK), ('隠し文字', HIDDEN)]:
+            for label, pat in [('変更履歴', REVISION), ('コメントの印', COMMENT_MARK), ('隠し文字', HIDDEN),
+                               ('作成者の名前（w:author）', AUTHOR)]:
                 n = len(pat.findall(x))
                 if n:
                     bad.append(f'{path}：{label} {n}')
         if path.startswith('word/') and os.path.basename(path) in COMMENT_PARTS:
             bad.append(f'{path}：コメントの部品が残っている')
+        if is_custom_xml(path) or path.startswith('docProps/thumbnail.'):
+            bad.append(f'{path}：付随の情報（customXml・サムネイル）が残っている')
+    # 関係づけが、消した部品を指したままになっていないか（Word が「壊れている」と言う）
+    for rels in [f for f in files_of(d) if f.endswith('.rels')]:
+        base = os.path.dirname(os.path.dirname(rels))
+        for m in re.finditer(r'<Relationship [^>]*?Target="([^"]+)"([^>]*)/>', read(d, rels)):
+            if 'TargetMode="External"' in m.group(0):
+                continue
+            target = m.group(1).lstrip('/') if m.group(1).startswith('/') else os.path.normpath(os.path.join(base, m.group(1))).replace(os.sep, '/')
+            if not os.path.exists(os.path.join(d, target)):
+                bad.append(f'{rels}：無い部品 {target} を指している')
+    settings = read(d, 'word/settings.xml') or ''
+    for label, pat in [('テンプレートのパス', r'<w:attachedTemplate\b'), ('文書の変数', r'<w:docVars>'), ('rsid', r'<w:rsids>|w:rsid\w*=')]:
+        if re.search(pat, settings):
+            bad.append(f'word/settings.xml：{label}が残っている')
     rels = read(d, 'word/_rels/document.xml.rels') or ''
     if re.search(r'Target="(?:%s)"' % '|'.join(re.escape(n) for n in COMMENT_PARTS), rels):
         bad.append('word/_rels/document.xml.rels：コメントの部品への関係づけが残っている')

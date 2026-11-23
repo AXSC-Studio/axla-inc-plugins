@@ -16,6 +16,10 @@ import hashlib
 import os
 import sys
 import zipfile
+import zlib
+
+MAX_BYTES = 50 * 1024 * 1024   # 展開後の大きさの上限（契約書の .docx としては十分に大きい）
+MAX_RATIO = 200                 # 圧縮率の上限（zip 爆弾を開かない）
 
 if len(sys.argv) != 3:
     sys.exit(__doc__)
@@ -28,7 +32,10 @@ else:
 if not pw:
     sys.exit('パスワードが空')
 
-z = zipfile.ZipFile(zpath)
+try:
+    z = zipfile.ZipFile(zpath)
+except zipfile.BadZipFile:
+    sys.exit('止まる：zip として読めない。人が確かめる')
 infos = [i for i in z.infolist() if not i.is_dir()]
 
 
@@ -45,6 +52,8 @@ def name_of(i):
 names = [name_of(i) for i in infos]
 if len(infos) != 1 or not names[0].lower().endswith('.docx'):
     sys.exit(f'止まる：中身が .docx 1つではない（{len(infos)} 個：{names}）。人が確かめる')
+if infos[0].file_size > MAX_BYTES or infos[0].file_size > MAX_RATIO * max(infos[0].compress_size, 1):
+    sys.exit(f'止まる：中身が大きすぎる（{infos[0].file_size} バイト）。人が確かめる')
 if infos[0].compress_type == 99:
     sys.exit('止まる：AES で暗号化されていて、この道具では開けない。人が確かめる')
 
@@ -52,6 +61,9 @@ try:
     data = z.read(infos[0], pwd=pw.encode('utf-8'))
 except RuntimeError:
     sys.exit('止まる：パスワードが違う')
+except (zipfile.BadZipFile, zlib.error):
+    # 違うパスワードでも、たまたま最初の確かめを通ると、展開の途中で壊れたと出る（Bad CRC など）
+    sys.exit('止まる：パスワードが違うか、zip が壊れている')
 del pw
 
 os.makedirs(outdir, exist_ok=True)

@@ -5,12 +5,21 @@
     python -I view.py <unpacked_dir> changed   # 変更のある段落だけ
     python -I view.py <unpacked_dir> accept    # 変更をすべて承諾したときの本文
 """
+import argparse
 import html
+import os
 import re
 import sys
 
-x = open(sys.argv[1] + '/word/document.xml', encoding='utf-8').read()
-mode = sys.argv[2]
+ap = argparse.ArgumentParser(description='展開済み .docx の本文を段落ごとに表示する')
+ap.add_argument('unpacked')
+ap.add_argument('mode', choices=['redline', 'changed', 'accept'])
+args = ap.parse_args()
+D = os.path.join(args.unpacked, 'word', 'document.xml')
+if not os.path.isfile(D):
+    sys.exit(f'止まる：{D} が無い（展開済みの .docx のフォルダを渡す）')
+x = open(D, encoding='utf-8').read()
+mode = args.mode
 body = x[x.index('<w:body>'):]
 for p in re.findall(r'<w:p\b(?:(?!<w:p\b).)*?</w:p>', body, flags=re.S):
     ppr = re.search(r'<w:pPr>.*?</w:pPr>', p, flags=re.S)
