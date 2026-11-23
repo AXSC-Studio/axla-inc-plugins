@@ -38,6 +38,10 @@ args = ap.parse_args()
 
 D = args.unpacked + '/word/document.xml'
 spec = json.load(open(args.changes, encoding='utf-8'))
+# 形式名：新しい名前は axla-legal/changes v1。旧名 legal-loop/changes v1 も同じ形として読む（前の記録を読めるように）
+KNOWN_SCHEMAS = {'axla-legal/changes v1', 'legal-loop/changes v1'}
+if spec.get('schema') and spec['schema'] not in KNOWN_SCHEMAS:
+    sys.exit(f'知らない形式の changes JSON：{spec["schema"]}（読めるのは {", ".join(sorted(KNOWN_SCHEMAS))}）')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import gate  # noqa: E402
 args.author = args.author or spec.get('author') or gate.load_config(os.path.abspath(args.changes)).get('author')

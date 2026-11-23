@@ -10,7 +10,7 @@
 ## Requirements
 
 - The system shall 契約ごとに Drive の契約フォルダを1つ作り、中身を下の「Drive の構成」のファイルだけにすること（社内の周回ごとにファイルを増やさない）
-- The system shall 契約書の版を、相手との境目をまたいだ回数（v1、v2、…、Final、Signed）で名前に付けること。社内の周回の数は名前に出さないこと
+- The system shall 契約書の版を vX.Y.Z（下の「版の決まり」）で名前に付けること。Final・Signed になったらそう書く。社内の周回の数は名前に出さないこと
 - The system shall 自社の直しを、相手の原本 .docx に変更履歴（作成者：利用側の `loop/legal/config.json` の `author`。コードに決め打ちしない）と理由のコメントを入れた形で作り、その版の社内用の gdoc（`F_vX.Y.Z_<自社名> Comments`）に同じ ID のまま取り込むこと。相手に送る .docx は、変更をすべて反映し、コメントと作成者などの情報を消した**清書**にすること（scripts/ の手順）
 - The system shall 内側のループで、検証役（prompts/reviewer-prompts.md）を並列に動かし、止める条件（致命的 0件）を満たすまで回すこと。予算（下の「予算」）が尽きたら「予算切れ」として記録し、G1 に上げること
 - The system shall 中間ループの間、LEGAL.md（loop/legal/LEGAL.md）を読むだけにし、書き換えないこと。学び（急ぎのものも）は Loop Log に書き、外側のループ（Signed・破談・INCIDENT の後）で PR として反映すること

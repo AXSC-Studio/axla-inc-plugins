@@ -1,6 +1,6 @@
 ---
 name: loop
-description: Use first for any contract work (an NDA or other contract arrived, "review this contract", "what's next on the NDA", a reply came back, sending, signing). It reads where each contract stands and runs only the next step. 日本語：契約の仕事は、まずこれを使う（契約書が届いた・この契約を見て・NDA の次は何か・相手の返事が来た・送る・署名）。契約ごとにいまどこかを読み、次の1歩だけを進める。
+description: Use first for any contract work (an NDA or other contract arrived, "review this contract", "what's next on the NDA", a reply came back, sending, signing). For Japanese-language contracts in .docx. Not for PDF-only contracts, general legal advice, or the signing itself. It reads where each contract stands and runs only the next step. 日本語：日本語の契約（.docx）向け。PDF だけの契約・一般的な法律相談・署名そのものには使わない。契約の仕事は、まずこれを使う（契約書が届いた・この契約を見て・NDA の次は何か・相手の返事が来た・送る・署名）。契約ごとにいまどこかを読み、次の1歩だけを進める。
 ---
 
 # loop（Axla Legal の入口）

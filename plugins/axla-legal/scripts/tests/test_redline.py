@@ -82,6 +82,28 @@ class TestRedline(unittest.TestCase):
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
 
 
+class TestSchemaName(unittest.TestCase):
+    """形式名：新しい名前も旧名も読み、知らない名前では止まる（#30）。"""
+
+    def run_with(self, schema):
+        with tempfile.TemporaryDirectory() as root:
+            d = make(root, goog_para('00000001', 0, '第1条 甲は乙に開示する。'))
+            p = os.path.join(root, 'c.json')
+            with open(p, 'w', encoding='utf-8') as f:
+                json.dump({'schema': schema, 'author': 'T', 'date': '2026-01-01T00:00:00Z',
+                           'changes': [{'op': 'rebuild', 'para': '00000001', 'text': '第1条 甲は乙に開示しない。'}]}, f, ensure_ascii=False)
+            return subprocess.run([sys.executable, '-I', REDLINE, d, p], capture_output=True, text=True)
+
+    def test_new_and_old_names(self):
+        self.assertEqual(self.run_with('axla-legal/changes v1').returncode, 0)
+        self.assertEqual(self.run_with('legal-loop/changes v1').returncode, 0)
+
+    def test_unknown_name_stops(self):
+        r = self.run_with('something/else v9')
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn('知らない形式', r.stderr)
+
+
 class TestAuthorFromConfig(unittest.TestCase):
     """作成者名をコードに決め打ちせず、利用側の config.json から読む（Issue #5）。"""
 

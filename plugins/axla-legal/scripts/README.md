@@ -149,7 +149,7 @@ EOF
 
 ```json
 {
-  "schema": "legal-loop/changes v1",
+  "schema": "axla-legal/changes v1",
   "author": "<作成者名（例：Reviewer┊Sample Studio）>",
   "initials": "AX",
   "date": "<送った版で使った日時（UTC）。例 2026-01-01T00:00:00Z>",
@@ -187,7 +187,7 @@ EOF
 
 ```json
 {
-  "schema": "legal-loop/changes v1",
+  "schema": "axla-legal/changes v1",
   "author": "サンプル合同会社",
   "initials": "SP",
   "changes": [
