@@ -16,6 +16,8 @@
 | `../hooks/stop_guard.py` | 終了条件（Exit Criteria）・予算上限（Budget Cap） | Stop hook。内側のループの途中は終わらせない。上限の周で G1 に上げて止める |
 | `event_page.py` | 検証器（Verifier） | event.json から告知の文面（Markdown）と告知サービスに渡す中身（JSON）を作る。visibility はいつも private。定員・参加費が budget.json と違えば止まる |
 | `make_eyecatch.py` | — | 文字だけのアイキャッチ（外の API を呼ばない。Pillow が要る） |
+| `freeze_kit.py` | 状態ストア（State Store） | 送る版を凍結（URL と中身のハッシュ）。同じ URL で中身が違えば止める。ハッシュを approve.py に渡す |
+| `update_partners.py` | 状態ストア・検証器 | 相手の台帳（番号だけ）を進める。会場の確定で G2 を記録。返事待ちの超過・古い下書き（【古い】）を見つける |
 | `eventops_lib.py` | — | 上の道具が共有する部品（置き場・runs.jsonl・checklist） |
 
 ## 道具の分け方
