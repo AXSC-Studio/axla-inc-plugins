@@ -1,6 +1,6 @@
 # 編集役・検証役の指示文
 
-どの役も、最初に利用側の `loop/meet-to-article/config.json`・`glossary.md`・`tone/` を全文読む。
+どの役も、最初に利用側の `loop/marketing/meeting-to-article.json`・`loop/marketing/glossary.md`・`loop/marketing/tone/` を全文読む。
 
 ---
 

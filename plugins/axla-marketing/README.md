@@ -22,11 +22,11 @@ Talk alone in a Meet and leave
 | `scripts/` | The watcher Apps Script, the draft JSON, a text-only eye-catch |
 
 ## What you put in your repository
-Plugins contain tools only. Your data lives in the using repository under `loop/meet-to-article/`.
+Plugins contain tools only. Your data lives in the using repository under `loop/marketing/`.
 
-- `config.json`: meeting title, category, length, eye-catch colors and so on (example in `scripts/README.md`)
-- `glossary.md`: fixes for common transcription errors
-- `tone/`: sample articles whose tone you want to follow
+- `meeting-to-article.json`: meeting title, category, length, eye-catch colors and so on (example in `scripts/README.md`)
+- `glossary.md` (shared across marketing skills): fixes for common transcription errors
+- `tone/` (shared): sample articles whose tone you want to follow
 
 ## Principles
 - Keep the energy of the talk. Edit, do not summarize. Never add what was not said.
@@ -60,11 +60,11 @@ MIT
 | `scripts/` | 見張りの Apps Script、下書きの JSON、文字だけのアイキャッチ |
 
 ### 利用側に置くもの
-プラグインは道具だけです。データは、使う側のリポジトリの `loop/meet-to-article/` に置きます。
+プラグインは道具だけです。データは、使う側のリポジトリの `loop/marketing/` に置きます。
 
-- `config.json`：Meet の題・カテゴリ・字数・アイキャッチの色など（例は `scripts/README.md`）
-- `glossary.md`：誤変換の直し方（例：「アスクの新築情報」→「axsc.me の新着情報」）
-- `tone/`：まねたい記事の見本
+- `meeting-to-article.json`：Meet の題・カテゴリ・字数・アイキャッチの色など（例は `scripts/README.md`）
+- `glossary.md`（マーケのスキルで共有）：誤変換の直し方（例：「アスクの新築情報」→「axsc.me の新着情報」）
+- `tone/`（共有）：まねたい記事の見本
 
 ### 大事にしていること
 - しゃべりの熱を残す。要約ではなく編集にする。言っていないことは足さない。

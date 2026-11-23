@@ -1,7 +1,7 @@
 """編集役が書いた Markdown から、CMS の下書きの JSON を作る。
 
 使い方:
-    python3 -I make_post.py <article.md> --config <loop/meet-to-article/config.json> --out-dir <記事の JSON の置き場> [--date yyyy-mm-dd]
+    python3 -I make_post.py <article.md> --config <loop/marketing/meeting-to-article.json> --out-dir <記事の JSON の置き場> [--date yyyy-mm-dd]
 
 article.md の形は prompts/editor-prompts.md の「出すもの」。
 - 1行目 `# 題`、次の段落がリード、`---` の後ろに `slug:` と `要確認:`

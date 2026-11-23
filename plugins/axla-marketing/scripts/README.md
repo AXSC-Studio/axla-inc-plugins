@@ -18,7 +18,7 @@ Python は `python3 -I` で動かす。必要なもの：`pip install -r require
 編集役が `prompts/editor-prompts.md` の形で書いた Markdown から、CMS の下書きの JSON を作る。
 
 ```bash
-python3 -I make_post.py article.md --config <利用側>/loop/meet-to-article/config.json --out-dir <記事の JSON の置き場> --date 2026-11-20
+python3 -I make_post.py article.md --config <利用側>/loop/marketing/meeting-to-article.json --out-dir <記事の JSON の置き場> --date 2026-11-20
 ```
 
 - status は必ず `draft`。同じ slug のファイルがあれば止める（上書きしない）。
@@ -30,10 +30,10 @@ python3 -I make_post.py article.md --config <利用側>/loop/meet-to-article/con
 文字だけのアイキャッチを作る。外の API を呼ばないので、お金はかからない。
 
 ```bash
-python3 -I make_eyecatch.py --title "<題>" --date 2026-11-20 --config <利用側>/loop/meet-to-article/config.json --out eyecatch.png
+python3 -I make_eyecatch.py --title "<題>" --date 2026-11-20 --config <利用側>/loop/marketing/meeting-to-article.json --out eyecatch.png
 ```
 
-## 利用側の config.json（例）
+## 利用側の loop/marketing/meeting-to-article.json（例）
 
 ```json
 {
