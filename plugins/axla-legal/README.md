@@ -29,7 +29,7 @@ A Claude Code plugin that runs a contract you received (starting with NDAs) from
 | Your Google Drive (connector) | Reads the original; creates the internal Google Doc | Review by your CEO or legal owner |
 | Your Gmail (connector) | Creates and reads reply drafts | Sending is always done by a person |
 | Google Drive API (optional) | `resolve_comments.py`, with your own `gcloud` token | Only when fixing an existing Google Doc |
-| Your Claude routine (optional) | `notify_reply.gs` sends a Gmail thread ID only | Wakes a watcher when a reply arrives |
+| Your Claude routine (optional, experimental) | `notify_reply.gs` sends a Gmail thread ID only | Wakes a read-only watcher when a reply arrives ([routines/reply-watcher.md](routines/reply-watcher.md)). Uses a beta API and may stop working without notice |
 
 Hooks run locally. Nothing is sent to Axla Inc. Details: [PRIVACY.md](PRIVACY.md).
 
@@ -115,7 +115,7 @@ MIT
 | あなたの Google ドライブ（つながり） | 原本を読む。社内用の Google ドキュメントを作る | 代表や法務の担当が見るため |
 | あなたの Gmail（つながり） | 返信の下書きを作って読む | 送信は必ず人が押す |
 | Google ドライブの API（任意） | `resolve_comments.py`（あなた自身の `gcloud` のトークン） | 前からある Google ドキュメントを直すときだけ |
-| あなたの Claude のルーティン（任意） | `notify_reply.gs` が Gmail のスレッド ID だけを送る | 返事が来たら見張りを起こすため |
+| あなたの Claude のルーティン（任意・試験中） | `notify_reply.gs` が Gmail のスレッド ID だけを送る | 返事が来たら、読むだけの見張りを起こすため（[routines/reply-watcher.md](routines/reply-watcher.md)）。beta の API を使うので、予告なく動かなくなることがある |
 
 Hook は手元だけで動きます。Axla Inc. には何も送りません。くわしくは [PRIVACY.md](PRIVACY.md)。
 

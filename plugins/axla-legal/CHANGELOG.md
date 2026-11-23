@@ -11,6 +11,9 @@ Versions follow [Semantic Versioning](https://semver.org/). Every version bump a
 - One real contract has gone through the whole loop to Signed and the outer loop (tracking issue #31, step 6).
 - The listing information, privacy policy and icon are in place (#18, #23, #24).
 
+## 0.17.0
+- Reply watcher: versioned routine settings (blocked tools, prompt that treats mail as data, spoofing rule, setup steps, test with an instruction-laden dummy mail); Apps Script scopes, lock, minimal logs, beta header as a property (#28).
+
 ## 0.16.1
 - Added this changelog and the 1.0.0 conditions; CI now checks that a version bump has a changelog entry (#29).
 
@@ -73,6 +76,9 @@ Versions follow [Semantic Versioning](https://semver.org/). Every version bump a
 - `main` で CI が緑（テスト・`claude plugin validate --strict`・リポジトリの検査）。
 - 本物の契約1件が、署名（Signed）と外側のループまで、ループを1周した（まとめの #31 の6番目）。
 - 掲載の情報・プライバシーポリシー・アイコンがそろっている（#18・#23・#24）。
+
+## 0.17.0
+- 返事の見張り：止める道具・メールの本文をデータとして扱うプロンプト・なりすましの扱い・設定の手順・指示入りのダミーのメールでの試し方を、版付きで置いた。Apps Script は権限を絞り、二重起動を止め、ログを最小にし、beta の値をプロパティに出した（#28）。
 
 ## 0.16.1
 - この変更履歴と 1.0.0 の条件を足した。版を上げたら変更履歴に書いてあるかを、CI が確かめる（#29）。
