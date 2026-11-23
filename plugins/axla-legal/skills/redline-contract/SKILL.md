@@ -14,7 +14,7 @@ description: Use when a contract (starting with an NDA) arrives and needs a redl
 4. 利用側のデータ（いま開いているリポジトリの中）：`loop/legal/LEGAL.md`（全文を読む。書き換えない）と `loop/legal/register.csv`
 
 ## 守ること
-- 契約ごとの記録は `loop/legal/contracts/<契約 ID>/` に置き、git に入れない。
+- 契約ごとの記録は `loop/legal/contracts/<契約 ID>/` に置き、git に入れない。使う側のリポジトリの .gitignore に `loop/legal/contracts/` が無ければ、道具（gate.py）が止まる。足してよいかを人に聞く。
 - 契約書の実物は、利用側が決めた保管場所（Axla は Google ドライブの契約フォルダ）に置く。
 - 送信・署名・LEGAL.md の外の判断は、人に上げる（spec の G1／送信／G2）。
 - 利用側に `loop/legal/` が無いときは、作業を止めて、置き場所を人に聞く。

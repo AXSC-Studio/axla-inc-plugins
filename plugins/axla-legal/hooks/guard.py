@@ -145,8 +145,30 @@ def pre(data):
         if re.search(r'(>>?\s*|\btee\b[^|;&]*|\b(sed|perl)\s+-i\S*\s[^|;&]*|\b(mv|cp|rm)\b[^|;&]*)\S*contracts/[^/\s]+/gate\.json', cmd):
             deny('gate.json は道具と Hook だけが書く。手で書き換えない。')
         for seg in re.split(r'[;&|]+', cmd):
-            if re.search(r'\bgit\s+add\b', seg) and (re.search(r'contracts', seg) or re.search(r'\s(-f|--force)\b', seg)):
-                deny('契約の記録（loop/legal/contracts/）は git に入れない（本文と相手の名前が入るため）。git add -f も使わない。')
+            if re.search(r'\bgit\s+add\b', seg) and (re.search(r'contracts', seg) or re.search(r'\s(-f|--force)\b', seg)
+                                                     or re.search(CONTRACT_FILE, seg)):
+                deny('契約の記録（loop/legal/contracts/）や契約書のファイル（.docx・.pdf・.zip・Redline Data.json）は '
+                     'git に入れない（本文と相手の名前が入るため）。git add -f も使わない。')
+            if re.search(r'\bgit\s+(commit|push)\b', seg):
+                bad = contract_files_in_git(root, push=bool(re.search(r'\bgit\s+push\b', seg)))
+                if bad:
+                    deny('契約書や契約の記録らしいファイルが、コミット（push）に入っている：' + ', '.join(bad[:5])
+                         + '。`git restore --staged <file>` で外す。本当に入れてよい見本なら、人が手で入れる。')
+
+
+# 契約書らしいファイル：.docx と .zip はどこでも、.pdf は loop/legal/ の下だけ（ほかの資料の PDF は止めない）
+CONTRACT_FILE = r'\.(docx|zip)\b|loop/legal/\S*\.pdf\b|Redline Data\.json|/contracts/'
+
+
+def contract_files_in_git(root, push=False):
+    """ステージ（push なら、まだ上流に無いコミット）の中の、契約書や契約の記録らしいファイル。"""
+    def names(args):
+        r = subprocess.run(['git', '-C', root] + args, capture_output=True, text=True, timeout=10)
+        return [n for n in r.stdout.split('\n') if n] if r.returncode == 0 else []
+    files = names(['diff', '--cached', '--name-only'])
+    if push:
+        files += names(['diff', '--name-only', '@{upstream}..HEAD'])
+    return sorted({f for f in files if re.search(CONTRACT_FILE, '/' + f)})
 
 
 def outer_branch(root):

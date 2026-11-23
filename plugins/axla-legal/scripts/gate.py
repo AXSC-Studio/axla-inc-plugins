@@ -18,6 +18,7 @@ import datetime
 import hashlib
 import json
 import os
+import subprocess
 import sys
 
 NAME = 'gate.json'
@@ -35,8 +36,27 @@ def load(cdir):
         return json.load(f)
 
 
+def ensure_ignored(cdir):
+    """契約の記録フォルダが git の除外に入っているかを確かめ、入っていなければ止まる（#22）。
+    このリポジトリの .gitignore は、使う側のリポジトリには効かない。使う側で除外を忘れると、
+    契約の本文や相手の名前がそのままコミットされる。git の外なら確かめない。"""
+    d = os.path.abspath(cdir)
+    probe = os.path.join(d, '_probe_gitignore')
+    r = subprocess.run(['git', '-C', os.path.dirname(d) if not os.path.isdir(d) else d, 'rev-parse', '--show-toplevel'],
+                       capture_output=True, text=True)
+    if r.returncode != 0:
+        return
+    top = r.stdout.strip()
+    c = subprocess.run(['git', '-C', top, 'check-ignore', '-q', probe], capture_output=True)
+    if c.returncode != 0:
+        sys.exit('止まる：契約の記録フォルダ（loop/legal/contracts/）が git の除外に入っていない。'
+                 '使う側のリポジトリの .gitignore に `loop/legal/contracts/` の1行を足してから、もう一度。'
+                 '（契約の本文や相手の名前がコミットされるのを防ぐため）')
+
+
 def save(cdir, g):
     os.makedirs(cdir, exist_ok=True)
+    ensure_ignored(cdir)
     p = os.path.join(cdir, NAME)
     tmp = p + '.tmp'
     with open(tmp, 'w', encoding='utf-8') as f:

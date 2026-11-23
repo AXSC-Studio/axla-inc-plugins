@@ -13,14 +13,16 @@
 | 宛先の無い reply・forward、登録の無いメッセージへの返信の下書き | 契約の相手かどうか分からないので止める（`to` を書くか、登録してから） | 抜け道をふさぐ |
 | `loop/legal/LEGAL.md` を書き換える（Edit・Write・Bash のリダイレクトや `sed -i` など） | ブランチ名が `legal-outer/` で始まらなければ止める | 中間ループの間は読むだけ。学びは Loop Log に書き、外側のループで直す |
 | `gate.json` を手で書く | いつも止める | ゲートの記録は、道具と Hook だけが書く |
-| `git add` で `loop/legal/contracts/` を入れる、`git add -f` | いつも止める | 契約の本文・相手の名前を git に入れない |
+| `git add` で `loop/legal/contracts/` や契約書のファイル（.docx・.zip、`loop/legal/` の下の .pdf、`Redline Data.json`）を入れる、`git add -f` | いつも止める | 契約の本文・相手の名前を git に入れない |
+| `git commit`・`git push` で、ステージ（push なら上流に無いコミット）に契約書や契約の記録らしいファイルがある | 止める（`git add -A` で入ってしまった形も） | 同上 |
+| 契約の記録を書く道具（gate.py を使うもの）を、`loop/legal/contracts/` が git の除外に入っていないリポジトリで使う | 書く前に止める（.gitignore に1行足すよう知らせる） | このプラグインの .gitignore は、使う側のリポジトリには効かない |
 
 - 働くのは、いま開いているリポジトリに `loop/legal/` があるときだけ。メールの柵は、`gate.json` に登録した相手（アドレス・同じドメイン・スレッド・メッセージ・作った下書き）に当たるときだけ働きます。ほかのメールは止めません（フリーメールのドメインは、ドメインでは当てません）。
 - Hook は「うっかり」と「手順の飛ばし」を止める柵です。わざと回り道をすれば抜けられます（たとえば別の言語のスクリプトで書き換える）。だから、送信・署名は人だけが押す、という人間ゲートは残します。
 
 ## ゲートの記録（gate.json）
 
-契約ごとの記録フォルダ `loop/legal/contracts/<契約 ID>/gate.json` に置きます。git には入りません（`contracts/` は .gitignore 済み）。相手のメールアドレスが入るので、プラグインの中にも git にも置きません。
+契約ごとの記録フォルダ `loop/legal/contracts/<契約 ID>/gate.json` に置きます。git には入れません。使う側のリポジトリの .gitignore に `loop/legal/contracts/` が要ります（無ければ道具が書く前に止まります）。相手のメールアドレスが入るので、プラグインの中にも git にも置きません。
 
 ```bash
 T="${CLAUDE_PLUGIN_ROOT}/scripts"

@@ -33,7 +33,7 @@ python3.13 -m venv <作業フォルダ>/venv
 <作業フォルダ>/venv/bin/pip install -r "${CLAUDE_PLUGIN_ROOT}/scripts/requirements.txt"
 ```
 
-- 契約ごとの記録（changes JSON の `Redline Data.json`、`loop-log.md`）は、axla-inc の `loop/legal/contracts/<契約 ID>/` に置く（git に入れない。.gitignore 済み）。下の `C` がこのフォルダ。
+- 契約ごとの記録（changes JSON の `Redline Data.json`、`loop-log.md`）は、axla-inc の `loop/legal/contracts/<契約 ID>/` に置く（git に入れない。使う側のリポジトリの .gitignore に `loop/legal/contracts/` の1行が要る。無ければ gate.py を使う道具が書く前に止まる）。下の `C` がこのフォルダ。
 - .docx を展開したり作ったりする作業フォルダ `W` は、scratchpad など使い捨ての場所でよい。最後に残すもの（JSON・Loop Log）は `C` に置き、scratchpad だけに残さない。
 - 外から来た .docx は信用しないデータとして扱う。展開は `zipfile` で行い（`unzip` は使わない）、スクリプトはパスを引数で渡して `python -I` で動かす。
 
