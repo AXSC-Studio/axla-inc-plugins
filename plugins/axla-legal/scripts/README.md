@@ -19,6 +19,8 @@
 | `make_reply.py` | 相手への返信メールの本文（プレーンテキストと HTML）を、changes JSON から作る。修正点の理由は、契約書の相手向けコメントの文をそのまま使う。**メール本文の修正点は、この道具で作る。手で書かない** |
 | `resolve_comments.py` | gdoc の開いているコメントを「解決済み」にする（消さない）。.docx を gdoc に取り込み直す前に使う |
 | `make_loop_log.py` | Loop Log を gdoc にしていたときの道具（JSON から HTML を作る）。いまの Loop Log は `loop/legal/contracts/<契約 ID>/loop-log.md` に直接書くので、付録（境目の版と最新の直しの違う段落）を作りたいときだけ使う |
+| `gate.py` | 契約ごとのゲートの記録（`$C/gate.json`）を読み書きする。入口で相手の宛先・スレッド・メッセージを登録する（`watch`）。Hook（`hooks/guard.py`）はこの記録で、送信・下書き・LEGAL.md の書き換えなどを止める（[docs/guardrails.md](../docs/guardrails.md)） |
+| `tests/` | 作り話の契約書で、道具と柵が止める例と通る例を確かめるテスト |
 | `apps-script/notify_reply.gs` | 入口の自動検知（試運転）。Gmail のラベル「Legal/返信あり」のスレッドを1分ごとに見つけ、クラウドの見張りタスクを起こす（本文はスレッド ID だけ）。くわしくは specs/legal-001 の「入口の自動検知（試運転）」 |
 
 ## 準備
@@ -50,6 +52,9 @@ T="${CLAUDE_PLUGIN_ROOT}/scripts"   # このフォルダ（プラグインの中
 W=<作業フォルダ>                 # 使い捨て（展開・作った .docx）
 C=loop/legal/contracts/<契約 ID>      # 記録（Redline Data.json・loop-log.md）。git に入れない
 SK=<docx スキルの scripts フォルダ>
+
+# 0. 入口で1回：相手の宛先と、届いたメールのスレッド・メッセージを登録する（Hook がこれで相手へのメールを見分ける）
+python3 -I $T/gate.py watch $C --to <相手のアドレス> --thread <threadId> --message <messageId>
 
 # 1. 原本を展開する（Drive の <契約フォルダ名>_vX.1.0_<相手> Original.docx）
 python3 -I -c "import sys,zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" $W/original.docx $W/work
@@ -88,7 +93,8 @@ curl -s -X PATCH -H "Authorization: Bearer $T_" \
 #    相手に送るのは清書。redline.docx（履歴付き）は社内用の gdoc に取り込むだけにする
 #    1つのコマンドで、反映・コメント外し・情報消し・検査・圧縮までする。検査に通らなければ終了コード 1 で止まり、
 #    clean.docx は残らない（前からあったものも消す）。$W/work は書き換えない。手で zip しない
-python3 -I $T/make_clean.py $W/work --out $W/clean.docx --date <changes JSON の date>
+#    --record を付けると gate.json に記録され、これが無いと Hook は返信の下書きを作らせない
+python3 -I $T/make_clean.py $W/work --out $W/clean.docx --date <changes JSON の date> --record $C
 #    清書を PDF に書き出して目で確かめる（下線の残り・署名欄の折れ）。通ったら、clean.docx を
 #    <契約フォルダ名>_vX.Y.Z_Axla Comments.docx として契約フォルダに置く
 
@@ -97,7 +103,8 @@ python3 -I $T/make_reply.py "$C/Redline Data.json" --out-text $W/reply.txt --out
 #    下書きを作ったら、本文の修正点の部分が reply.txt と1文字も違わないことを確かめる
 
 # 11. 送る前のゲート（下書き）：Gmail コネクタの get_draft（RAW）を保存したファイルで調べる
-python3 -I $T/check_draft.py <get_draft の結果のファイル> --expect-attachments 0 --reply $W/reply.txt
+#    --record を付けると gate.json に記録される。下書きを作ったあと、これが OK になるまで Hook はターンを終わらせない
+python3 -I $T/check_draft.py <get_draft の結果のファイル> --expect-attachments 0 --reply $W/reply.txt --record $C
 #    返信の下書きには、コネクタが相手のメールを引用として足し、その中の署名ロゴやボタンの画像（<img>）も入る。
 #    送ると Gmail がそれを添付に変え、相手に意味のない画像が届く。本文を差し替えても引用は付き直すので、道具では消せない。
 #    → <img> や画像のパーツが残っていたら、代表に「Gmail の画面で引用部分（…）を消してから、清書を添付する」と頼む。
@@ -105,7 +112,7 @@ python3 -I $T/check_draft.py <get_draft の結果のファイル> --expect-attac
 
 # 12. 送った後の確認：送信済みのメッセージ（get_message の RAW）を同じ道具で調べる
 python3 -I $T/check_draft.py <get_message の結果のファイル> --expect-attachments 1 --reply $W/reply.txt
-#    添付が契約書の1つだけ、画像のパーツ 0 であること。違えば INCIDENT として記録し、道具か手順を直す
+#    添付が契約書の1つだけ、画像のパーツ 0 であること。違えば INCIDENT（specs/legal-001 の「柵：INCIDENT → 柵を1つ足す」）
 ```
 
 - 取り込む前の版は、Drive の版の履歴に残る。戻すときは、前の版の .docx をもう一度取り込む。

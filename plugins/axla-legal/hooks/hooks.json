@@ -1,0 +1,28 @@
+{
+  "description": "Axla Legal guardrails: stop sending to contract counterparties, unchecked reply drafts, edits to LEGAL.md during a deal, and adding contract records to git",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "mcp__.*__(send_message|reply|forward|create_draft|update_draft)|Edit|Write|MultiEdit|NotebookEdit|Bash",
+        "hooks": [
+          { "type": "command", "command": "python3 -I \"${CLAUDE_PLUGIN_ROOT}/hooks/guard.py\" pre", "timeout": 10 }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "mcp__.*__(create_draft|update_draft)",
+        "hooks": [
+          { "type": "command", "command": "python3 -I \"${CLAUDE_PLUGIN_ROOT}/hooks/guard.py\" post", "timeout": 10 }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "python3 -I \"${CLAUDE_PLUGIN_ROOT}/hooks/guard.py\" stop", "timeout": 10 }
+        ]
+      }
+    ]
+  }
+}

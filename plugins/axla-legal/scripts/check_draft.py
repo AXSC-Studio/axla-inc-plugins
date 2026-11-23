@@ -1,7 +1,7 @@
 """Gmail の下書き（または送信済みのメール）の RAW を調べ、画像と添付の数を数える。送る前と送った後のゲートに使う。
 
 使い方:
-    python3 -I check_draft.py <get_draft／get_message の RAW を保存した JSON> [--expect-attachments 1] [--reply reply.txt]
+    python3 -I check_draft.py <get_draft／get_message の RAW を保存した JSON> [--expect-attachments 1] [--reply reply.txt] [--record <契約の記録フォルダ>]
 
 - Gmail コネクタの get_draft（messageFormat=RAW）の結果は大きいので、ファイルに保存されたものを渡す。
 - 調べること：
@@ -10,6 +10,8 @@
   - --reply を渡すと、修正点の部分が make_reply.py の出力どおり入っているか（行頭と行末の空白は除いて比べる）
 - 期待：<img> 0、画像のパーツ 0、添付は --expect-attachments の数だけ（下書きでは 0、送った後は契約書の 1）。
   どれかが違えば、終了コード 1 で止まる。
+- --record を渡すと、契約の gate.json の draft に結果を書く。下書きを作った／変えたあと、
+  ここで OK が記録されるまで、Hook（Stop）はターンを終わらせない。
 """
 import argparse
 import base64
@@ -24,6 +26,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument('raw_json')
 ap.add_argument('--expect-attachments', type=int, default=0)
 ap.add_argument('--reply', help='make_reply.py のプレーンテキストの出力')
+ap.add_argument('--record', help='契約の記録フォルダ（loop/legal/contracts/<契約 ID>）。gate.json に結果を書く')
 args = ap.parse_args()
 
 d = json.load(open(args.raw_json, encoding='utf-8'))
@@ -56,5 +59,15 @@ if args.reply:
     same = any(got[i:i + len(block)] == block for i in range(len(got) - len(block) + 1))
     print(f'修正点（{len(block)} 行）が make_reply.py の出力どおり入っている：{same}')
     ok = ok and same
+if args.record:
+    import os
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import gate
+    g = gate.load(args.record)
+    dr = g.get('draft', {})
+    dr.update({'checked_ok': ok, 'checked_at': gate.now(), 'expect_attachments': args.expect_attachments})
+    if ok:
+        dr['pending'] = False
+    gate.update(args.record, 'draft', dr)
 print('OK' if ok else 'NG：送る前に直す（引用の画像を消す、添付をそろえる）')
 sys.exit(0 if ok else 1)
