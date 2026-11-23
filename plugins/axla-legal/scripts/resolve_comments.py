@@ -4,9 +4,11 @@
 そのままだと、前のコメントと新しいコメントが二重になる。取り込む前に、開いているコメントを解決済みにしておく。
 
 使い方:
-    T=$(gcloud auth print-access-token) python3 -I resolve_comments.py <gdoc の ID> [--before 2026-01-01T00:00:00Z] [--dry-run]
+    GOOGLE_ACCESS_TOKEN=$(gcloud auth print-access-token) python3 -I resolve_comments.py <gdoc の ID> [--before 2026-01-01T00:00:00Z] [--dry-run]
 
-- 環境変数 T のアクセストークンを使う（トークンは表示しない・保存しない）。
+- 環境変数 GOOGLE_ACCESS_TOKEN のアクセストークンを使う（トークンは表示しない・保存しない。コマンドの引数にも入れない）。
+  道具のフォルダの T とは別の名前にしてある。
+- 標準の流れでは使わない（gdoc は内側のループの最後に1回だけ作るため）。前からある gdoc を直すときだけ。
 - --before を付けると、その時刻より前に作られたコメントだけを解決済みにする。
 - 解決済みにするには、"resolve" の返信を1つ付ける（Drive API の replies.create）。コメントは消さない。
 - 最後に、開いているコメントと解決済みのコメントの数を表示する。
@@ -24,14 +26,16 @@ ap.add_argument('--before', help='この時刻（RFC 3339）より前に作ら�
 ap.add_argument('--note', default='取り込み直しの前に、解決済みにしました。', help='解決の返信に書く文（社内用）')
 ap.add_argument('--dry-run', action='store_true')
 args = ap.parse_args()
-T = os.environ.get('T') or sys.exit('環境変数 T にアクセストークンを入れる')
+TOKEN = os.environ.get('GOOGLE_ACCESS_TOKEN') or sys.exit('環境変数 GOOGLE_ACCESS_TOKEN にアクセストークンを入れる')
+TIMEOUT = 30  # 秒。応答が無いまま止まり続けないように
 BASE = f'https://www.googleapis.com/drive/v3/files/{args.file_id}/comments'
 
 
 def call(method, url, body=None):
     req = urllib.request.Request(url, method=method, data=json.dumps(body).encode() if body is not None else None,
-                                 headers={'Authorization': f'Bearer {T}', 'Content-Type': 'application/json'})
-    return json.load(urllib.request.urlopen(req))
+                                 headers={'Authorization': f'Bearer {TOKEN}', 'Content-Type': 'application/json'})
+    with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
+        return json.load(r)
 
 
 def all_comments():
