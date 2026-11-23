@@ -106,8 +106,8 @@ class TestMakeClean(unittest.TestCase):
             self.assertEqual(a.read(), b.read())
 
     def test_stops_and_leaves_no_file(self):
-        # accept.py が扱わない変更履歴（移動）を入れる → 検査で止まり、前の清書も消える
-        extra = '<w:p><w:moveFrom w:id="5" w:author="Tester"><w:r><w:t>動かした文</w:t></w:r></w:moveFrom></w:p>'
+        # accept.py が扱わない変更履歴（表のセルの追加）を入れる → 検査で止まり、前の清書も消える
+        extra = '<w:tbl><w:tr><w:tc><w:tcPr><w:cellIns w:id="5" w:author="Tester"/></w:tcPr><w:p/></w:tc></w:tr></w:tbl>'
         d = make_unpacked(self.root, extra=extra)
         with open(self.out, 'wb') as f:
             f.write(b'old clean')

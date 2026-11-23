@@ -11,13 +11,18 @@
 その関係づけ）は comment.py（docx スキル付属。README の「入手先」）が書く。
 このスクリプトは、本文の該当段落に範囲の印（commentRangeStart／End）と参照を置く。
 comment.py は defusedxml を使うので、README の venv の python で実行する。
+
+先に、コメントを付ける段落がすべてあるかを確かめる。作業は写しで行い、全部うまくいったときだけ元と入れ替える
+（途中で落ちても、コメントだけが残った半端な文書にならない）。
 """
 import argparse
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 
 ap = argparse.ArgumentParser()
 ap.add_argument('unpacked')
@@ -39,7 +44,19 @@ if start_id is None:
     cx = args.unpacked + '/word/comments.xml'
     ids = [int(i) for i in re.findall(r'<w:comment [^>]*w:id="(\d+)"', open(cx, encoding='utf-8').read())] if os.path.exists(cx) else []
     start_id = max(ids) + 1 if ids else 0
-f = args.unpacked + '/word/document.xml'
+if not os.path.isfile(args.comment_py):
+    sys.exit(f'止まる：comment.py が無い：{args.comment_py}（README の「入手先」）')
+src = os.path.abspath(args.unpacked)
+with open(os.path.join(src, 'word', 'document.xml'), encoding='utf-8') as fh:
+    x0 = fh.read()
+missing = sorted({p for c in comments for p in (c['start'], c.get('end') or c['start'])
+                  if not re.search(r'w14:paraId="%s"' % re.escape(p), x0)})
+if missing:
+    sys.exit(f'止まる：コメントを付ける段落が見つからない：{", ".join(missing)}（何も書いていない）')
+tmp = tempfile.mkdtemp(prefix='add_comments_')
+work = os.path.join(tmp, 'u')
+shutil.copytree(src, work)
+f = work + '/word/document.xml'
 
 
 def open_empty(x, pid):
@@ -50,23 +67,34 @@ def open_empty(x, pid):
 for k, c in enumerate(comments):
     n = start_id + k
     start, end, text = c['start'], c.get('end') or c['start'], c['text']
-    cmd = [sys.executable, args.comment_py, args.unpacked, text, '--id', str(n), '--author', author]
+    cmd = [sys.executable, args.comment_py, work, text, '--id', str(n), '--author', author]
     if initials:
         cmd += ['--initials', initials]
-    subprocess.run(cmd, check=True, capture_output=True)
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    if r.returncode != 0:
+        shutil.rmtree(tmp, ignore_errors=True)
+        sys.exit(f'止まる：comment.py が {k + 1} 件目で失敗した（何も書いていない）。\n' + (r.stderr or r.stdout).strip()[-800:])
     x = open(f, encoding='utf-8').read()
     x = open_empty(x, start)
     x = open_empty(x, end)
     # 始まり：段落の pPr の直後
     m = re.search(r'<w:p\b[^>]*?w14:paraId="%s"[^>]*?>(<w:pPr>.*?</w:pPr>)?' % re.escape(start), x, flags=re.S)
     if not m:
+        shutil.rmtree(tmp, ignore_errors=True)
         sys.exit(f'段落が見つからない: {start}')
     x = x[:m.end()] + f'<w:commentRangeStart w:id="{n}"/>' + x[m.end():]
     # 終わり：段落の </w:p> の直前。参照のランに文字スタイルは付けない（雛形に定義がないことが多い）
     m = re.search(r'<w:p\b[^>]*?w14:paraId="%s"[^>]*?>.*?(</w:p>)' % re.escape(end), x, flags=re.S)
     if not m:
+        shutil.rmtree(tmp, ignore_errors=True)
         sys.exit(f'段落が見つからない: {end}')
     ref = f'<w:commentRangeEnd w:id="{n}"/><w:r><w:commentReference w:id="{n}"/></w:r>'
     x = x[:m.start(1)] + ref + x[m.start(1):]
     open(f, 'w', encoding='utf-8').write(x)
+# 全部うまくいったので、元と入れ替える
+bak = src + '.bak_add_comments'
+os.replace(src, bak)
+shutil.move(work, src)
+shutil.rmtree(bak)
+shutil.rmtree(tmp, ignore_errors=True)
 print('comments:', len(comments))
