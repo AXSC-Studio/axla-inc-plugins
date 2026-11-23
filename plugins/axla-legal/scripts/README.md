@@ -107,10 +107,13 @@ python3 -I $T/make_clean.py $W/work --out $W/clean.docx --date <changes JSON の
 #    <契約フォルダ名>_vX.Y.Z_Axla Comments.docx として契約フォルダに置く
 
 # 10. 返信メールの本文を作る（手で書かない）。下書きは、相手のメールのスレッドの中に作り、添付は代表が付ける
-python3 -I $T/make_reply.py "$C/Redline Data.json" --out-text $W/reply.txt --out-html $W/reply.html
+#    --record で reply.txt の写しを $C に置く（Hook が下書きの検査で使う）
+python3 -I $T/make_reply.py "$C/Redline Data.json" --out-text $W/reply.txt --out-html $W/reply.html --record $C
 #    下書きを作ったら、本文の修正点の部分が reply.txt と1文字も違わないことを確かめる
 
-# 11. 送る前のゲート（下書き）：Gmail コネクタの get_draft（RAW）を保存したファイルで調べる
+# 11. 送る前のゲート（下書き）：下書きを作ったら、Gmail のつながりの get_draft を messageFormat=RAW で呼ぶ。
+#    Hook がその結果をその場で検査し、gate.json に記録する（ファイルに写す手間は要らない。Issue #34）。
+#    手で走らせるときは、結果を保存したファイルで：
 #    --record を付けると gate.json に記録される。下書きを作ったあと、これが OK になるまで Hook はターンを終わらせない
 python3 -I $T/check_draft.py <get_draft の結果のファイル> --expect-attachments 0 --reply $W/reply.txt --record $C
 #    返信の下書きには、コネクタが相手のメールを引用として足し、その中の署名ロゴやボタンの画像（<img>）も入る。

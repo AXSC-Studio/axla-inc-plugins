@@ -19,6 +19,7 @@ import gate  # noqa: E402
 
 MAIL = re.compile(r'^mcp__.+__(send_message|reply|forward|create_draft|update_draft)$')
 SEND = {'send_message', 'reply', 'forward'}
+READ = re.compile(r'^mcp__.+__(get_draft|get_message)$')
 OUTER_BRANCH = 'legal-outer/'  # 外側のループ（LEGAL.md を直す PR）のブランチの頭
 FREE_MAIL = {'gmail.com', 'googlemail.com', 'yahoo.co.jp', 'yahoo.com', 'outlook.com', 'outlook.jp', 'hotmail.com',
              'icloud.com', 'me.com', 'live.jp', 'live.com', 'docomo.ne.jp', 'ezweb.ne.jp', 'softbank.ne.jp'}
@@ -156,8 +157,59 @@ def outer_branch(root):
         return False
 
 
+def additional(text):
+    print(json.dumps({'hookSpecificOutput': {'hookEventName': 'PostToolUse', 'additionalContext': text}}, ensure_ascii=False))
+
+
+def post_read(data, action):
+    """get_draft／get_message の結果を、その場で送る前（送った後）の検査にかける（Issue #34）。"""
+    root = project_root(data)
+    if not root:
+        return
+    inp = data.get('tool_input') or {}
+    import check_draft
+    found = check_draft.find_raw(data.get('tool_response'))
+    thread = found[1] if found else None
+    hits = []
+    for cid, cdir, g in gate.contracts(root):
+        if action == 'get_draft' and inp.get('draftId') in set(g.get('draft', {}).get('ids', [])):
+            hits.append((cid, cdir, g))
+        elif action == 'get_message' and (inp.get('messageId') in set(g.get('watch', {}).get('messages', []))
+                                          or (thread and thread in set(g.get('watch', {}).get('threads', [])))):
+            hits.append((cid, cdir, g))
+    if not hits:
+        return
+    if not found:
+        additional('Axla Legal の柵：契約の下書き／メールを、検査できる形で読んでいない。'
+                   'messageFormat=RAW で、もう一度 get_draft（get_message）を呼ぶ。呼べば Hook が自動で検査する。')
+        return
+    raw = found[0]
+    expect = 0 if action == 'get_draft' else 1
+    msgs = []
+    for cid, cdir, g in hits:
+        reply = os.path.join(cdir, 'reply.txt')
+        reply_text = open(reply, encoding='utf-8').read() if os.path.exists(reply) else None
+        ok, lines = check_draft.check(raw, expect, reply_text)
+        if reply_text is None:
+            ok = False
+            lines.append('修正点：reply.txt が無い（make_reply.py --record で作る）')
+        if action == 'get_draft':
+            check_draft.record(cdir, ok, expect)
+        else:
+            check_draft.record(cdir, ok, expect, kind='sent')
+        head = f'契約 {cid} の{"下書き" if action == "get_draft" else "送ったメール"}の検査：{"OK" if ok else "NG"}'
+        if not ok and action == 'get_message':
+            head += '（INCIDENT。spec の「柵：INCIDENT → 柵を1つ足す」へ）'
+        msgs.append(head + '\n' + '\n'.join(lines))
+    additional('Axla Legal の柵（自動の検査）：\n' + '\n\n'.join(msgs))
+
+
 def post(data):
     name = data.get('tool_name', '')
+    r = READ.match(name)
+    if r:
+        post_read(data, r.group(1))
+        return
     m = MAIL.match(name)
     if not m or m.group(1) not in ('create_draft', 'update_draft'):
         return
@@ -191,8 +243,8 @@ def stop(data):
     if not pending:
         return
     msg = ('Axla Legal の柵：契約 ' + ', '.join(pending) + ' の返信の下書きが、送る前の確認を通っていない。'
-           'get_draft（RAW）を保存して `check_draft.py <file> --expect-attachments 0 --reply reply.txt --record <契約の記録フォルダ>` '
-           'を走らせ、OK になってから終える。')
+           'get_draft を messageFormat=RAW で呼ぶと、Hook が自動で検査する（reply.txt は make_reply.py --record で置く）。'
+           'OK になってから終える。')
     if data.get('stop_hook_active'):
         print(json.dumps({'systemMessage': msg + '（同じ理由で2回止めたので、ここでは終える。代表が確かめること）'}, ensure_ascii=False))
         return
