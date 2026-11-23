@@ -14,6 +14,8 @@
 | `checklist.py` | 状態ストア（State Store） | 内側の台帳。証拠の無い項目・致命的が残る検証役の項目は達成にできない。検証役はスクリプトの後 |
 | `check_kit.py` | 検証器（Verifier） | 全項目が証拠つきで達成なら exit 0。会場の確定（G2）のあとに【仮】が残れば exit 1 |
 | `../hooks/stop_guard.py` | 終了条件（Exit Criteria）・予算上限（Budget Cap） | Stop hook。内側のループの途中は終わらせない。上限の周で G1 に上げて止める |
+| `event_page.py` | 検証器（Verifier） | event.json から告知の文面（Markdown）と告知サービスに渡す中身（JSON）を作る。visibility はいつも private。定員・参加費が budget.json と違えば止まる |
+| `make_eyecatch.py` | — | 文字だけのアイキャッチ（外の API を呼ばない。Pillow が要る） |
 | `eventops_lib.py` | — | 上の道具が共有する部品（置き場・runs.jsonl・checklist） |
 
 ## 道具の分け方

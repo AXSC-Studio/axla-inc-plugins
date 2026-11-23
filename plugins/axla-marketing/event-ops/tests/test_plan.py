@@ -106,7 +106,7 @@ class EventLoopTest(unittest.TestCase):
     # --- new_event -------------------------------------------------------
     def test_init_creates_event_with_all_items_unmet(self):
         self.init()
-        for name in ["plan.md", "event-log.md", "checklist.json", "budget.json", "state.json"]:
+        for name in ["plan.md", "event-log.md", "checklist.json", "budget.json", "state.json", "event.json"]:
             self.assertTrue((self.event / name).exists(), name)
         items = self.checklist()["items"]
         self.assertGreaterEqual(len(items), 8)
