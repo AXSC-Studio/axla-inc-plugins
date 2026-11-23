@@ -2,9 +2,10 @@
 
 使い方:
     python add_comments.py <unpacked_dir> <changes.json> --comment-py <comment.py のパス> \
-        [--author "Analy┊Axla Inc."] [--initials AX] [--comment-id-start N]
+        [--author "<作成者名>"] [--initials <頭文字>] [--comment-id-start N]
 
---author／--initials を省くと、changes JSON の "author"／"initials" を使う。作成者がどちらにもなければ、Axla 側の標準の作成者名「Analy┊Axla Inc.」。
+--author／--initials を省くと、changes JSON の "author"／"initials"、それもなければ利用側の loop/legal/config.json の値を使う。
+作成者名がどれにも無ければ止まる（作成者名をコードに決め打ちしない。Issue #5）。
 --comment-id-start を省くと、原本にある既存のコメントの ID の最大＋1 から振る（なければ 0）。
 
 コメントの本体（comments.xml・commentsExtended.xml・commentsExtensible.xml・commentsIds.xml の4つの部品と、
@@ -35,10 +36,13 @@ args = ap.parse_args()
 
 spec = json.load(open(args.changes, encoding='utf-8'))
 comments = spec.get('comments', [])
-author = args.author or spec.get('author') or 'Analy┊Axla Inc.'  # Axla 側の標準の作成者名
-initials = args.initials if args.initials is not None else spec.get('initials', '')
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import gate  # noqa: E402
+cfg = gate.load_config(os.path.abspath(args.changes))
+author = args.author or spec.get('author') or cfg.get('author')
+initials = args.initials if args.initials is not None else spec.get('initials', cfg.get('initials', ''))
 if not author:
-    sys.exit('作成者がない：--author か、changes JSON の "author" を指定する')
+    sys.exit('作成者名がない：--author か、changes JSON の "author" か、利用側の loop/legal/config.json の "author" に書く')
 start_id = args.comment_id_start
 if start_id is None:
     cx = args.unpacked + '/word/comments.xml'

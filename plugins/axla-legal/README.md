@@ -41,6 +41,7 @@ Hooks run locally. Nothing is sent to Axla Inc. Details: [PRIVACY.md](PRIVACY.md
 
 ## Troubleshooting
 - **"loop/legal/contracts/ is not git-ignored"**: add the line from `templates/gitignore.txt` to your `.gitignore`.
+- **"No author name"**: copy `templates/config.json` to `loop/legal/config.json` and fill in your values.
 - **A hook blocked an action**: read the reason; it names the missing check (clean copy, draft check, …). Run that step instead of working around it.
 - **`${CLAUDE_PLUGIN_ROOT}` is empty in a shell**: it is only expanded inside skills; use the absolute path shown by the skill.
 - **The draft check never runs**: read the draft with `get_draft` and `messageFormat=RAW`; the hook checks it.
@@ -68,7 +69,7 @@ python3 -I "$T/make_clean.py" "$W/work" --out "$W/clean.docx"       # the clean 
 python3 -I "$T/make_reply.py" "$E/Redline Data.json" --out-text "$W/reply.txt" --out-html "$W/reply.html"
 ```
 
-Templates for your own repository are in `templates/` (`LEGAL.md`, `register.csv`, the `.gitignore` line).
+Templates for your own repository are in `templates/` (`LEGAL.md`, `register.csv`, `config.json` with your company name and the author name for tracked changes, and the `.gitignore` line). Nothing in the plugin is tied to one company.
 
 ## Example prompts
 - "An NDA arrived from a new partner. `/axla-legal:loop`" — starts intake, then the redline and review.
@@ -124,6 +125,7 @@ Hook は手元だけで動きます。Axla Inc. には何も送りません。�
 
 ### 困ったとき
 - **「loop/legal/contracts/ が git の除外に入っていない」**：`templates/gitignore.txt` の1行を `.gitignore` に足す。
+- **「作成者名がない」**：`templates/config.json` を `loop/legal/config.json` に写して、自社の値を書く。
 - **Hook に止められた**：理由を読む。足りない確認（清書・下書きの検査 …）の名前が出ているので、回り道をせず、その手順をやる。
 - **シェルで `${CLAUDE_PLUGIN_ROOT}` が空**：スキルの中でしか置き換わらない。スキルに出ている絶対パスを使う。
 - **下書きの検査が走らない**：`get_draft` を `messageFormat=RAW` で読む。Hook が検査する。
@@ -151,7 +153,7 @@ python3 -I "$T/make_clean.py" "$W/work" --out "$W/clean.docx"       # 相手に�
 python3 -I "$T/make_reply.py" "$E/Redline Data.json" --out-text "$W/reply.txt" --out-html "$W/reply.html"
 ```
 
-自社のリポジトリに置くひな形は `templates/` にあります（`LEGAL.md`・`register.csv`・`.gitignore` の1行）。
+自社のリポジトリに置くひな形は `templates/` にあります（`LEGAL.md`・`register.csv`・自社名と変更履歴の作成者名を書く `config.json`・`.gitignore` の1行）。プラグインの中に、特定の会社の決め打ちはありません。
 
 ### 例のプロンプト
 - 「新しい取引先から NDA が届いた。`/axla-legal:loop`」：受け取りから始め、直しと検証へ進む。

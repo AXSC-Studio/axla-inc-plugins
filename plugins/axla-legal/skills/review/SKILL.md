@@ -9,8 +9,9 @@ description: Part of Axla Legal, normally called from /axla-legal:loop. Checks a
 
 1. 承諾後の本文を作る：`view.py <work> accept`。
 2. 参照を機械で確かめる：`check_refs.py <work> --out <W>/review-refs.md`。
-3. 検証役を起動する（1周目と、本文を大きく直した周は4体を並列に、互いの結果を見せずに。小さな直しは1体に4観点）。それぞれの出力を `<W>/review-<名前>.md` に保存する。
-4. 合否を道具で決めて記録する：`count_findings.py <W>/review-*.md --record <記録フォルダ>`。検証役の書いた件数と合わなければ、その検証役をもう一度回す。参照の誤りは、検証役の重さにかかわらず致命的。
-5. 周回を数える：`budget.py cycle <記録フォルダ> --version vX.Y.Z`。
-6. Loop Log の「各周の記録」に、検証役ごとの件数と指摘を書く（どの版の指示文で検証したかも）。
-7. /axla-legal:loop に戻る（NG なら redline-contract、OK なら gdoc に進む）。
+3. 指示文の差し込みを埋める：`{OUR_PARTY_NAME}`・`{OUR_AI_USAGE}` は利用側の `loop/legal/config.json` の `our_party_name`・`ai_usage`、`{OUR_SIDE}`・`{THEIR_SIDE}` は契約書の前文（自社が甲か乙か）。config.json が無い・ひな形のままなら、止めて人に聞く。
+4. 検証役を起動する（1周目と、本文を大きく直した周は4体を並列に、互いの結果を見せずに。小さな直しは1体に4観点）。それぞれの出力を `<W>/review-<名前>.md` に保存する。
+5. 合否を道具で決めて記録する：`count_findings.py <W>/review-*.md --record <記録フォルダ>`。検証役の書いた件数と合わなければ、その検証役をもう一度回す。参照の誤りは、検証役の重さにかかわらず致命的。
+6. 周回を数える：`budget.py cycle <記録フォルダ> --version vX.Y.Z`。
+7. Loop Log の「各周の記録」に、検証役ごとの件数と指摘を書く（どの版の指示文で検証したかも）。
+8. /axla-legal:loop に戻る（NG なら redline-contract、OK なら gdoc に進む）。

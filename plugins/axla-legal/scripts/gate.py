@@ -98,6 +98,21 @@ def find_root(start):
         d = up
 
 
+CONFIG_KEYS = ('our_party_name', 'author', 'initials', 'doc_label', 'ai_usage')
+
+
+def load_config(start):
+    """利用側の loop/legal/config.json（自社名・作成者名など）を読む。見つからなければ空の辞書。
+    値が「<」で始まる（ひな形のまま）項目は、無いものとして扱う。"""
+    root = find_root(start) if start else None
+    p = os.path.join(root, 'loop', 'legal', 'config.json') if root else None
+    if not p or not os.path.exists(p):
+        return {}
+    with open(p, encoding='utf-8') as f:
+        d = json.load(f)
+    return {k: v for k, v in d.items() if k in CONFIG_KEYS and isinstance(v, str) and v and not v.startswith('<')}
+
+
 def contracts(root):
     """(契約 ID, 記録フォルダ, gate.json の中身) を、gate.json のある契約だけ返す。"""
     base = os.path.join(root, 'loop', 'legal', 'contracts')

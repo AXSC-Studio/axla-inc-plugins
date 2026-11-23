@@ -1,4 +1,4 @@
-"""ループ記録（axla-inc の loop/legal/contracts/<契約 ID>/loop-log.md）の Google ドキュメント用 HTML を、JSON から作る。
+"""ループ記録（利用側のリポジトリの loop/legal/contracts/<契約 ID>/loop-log.md）の Google ドキュメント用 HTML を、JSON から作る。
 
 使い方:
     python -I make_loop_log.py <log.json> <out.html>
@@ -19,7 +19,7 @@ log.json の形（例）:
   "appendix": {
     "title": "付録：境目の版と最新の直しの違い",
     "note": "…",
-    "base": {"label": "最新の直し", "path": "その版の gdoc（F_vX.Y.Z_Axla Comments）から書き出した .docx（変更をすべて承諾したもの）か .txt／.md"},
+    "base": {"label": "最新の直し", "path": "その版の gdoc（F_vX.Y.Z_<自社名> Comments）から書き出した .docx（変更をすべて承諾したもの）か .txt／.md"},
     "versions": [{"label": "v1", "path": "F_vX.1.0_<相手> Original.docx"}, {"label": "v3", "path": "F_v3_<相手> ….docx"}]
   }
 }
