@@ -13,7 +13,7 @@
 | `add_comments.py` | changes JSON の `comments` を、Word のコメントとして入れる（本体は `comment.py`。下の「入手先」） |
 | `check_draft.py` | Gmail の下書き（送った後は送信済みのメール）を調べる。HTML の `<img>`、画像のパーツ、添付の数、修正点が make_reply.py の出力どおりかを見て、違えば止まる |
 | `intake_ppap.py` | パスワード付き zip（PPAP）で届いた契約書を展開する。パスワードは標準入力か入力欄で受け、表示も保存もしない（引数にしない）。中身が .docx 1つでなければ止まる |
-| `make_clean.py` | 相手に送る**清書**を作る。変更をすべて反映し、コメントと作成者などの情報を消す。**相手に送るのは清書、社内の gdoc は履歴付き** |
+| `make_clean.py` | 相手に送る**清書**の .docx を作る。変更をすべて反映し、コメントと作成者などの情報を消し、清書になっているかを自分で確かめてから圧縮する。通らなければ清書を作らない。**相手に送るのは清書、社内の gdoc は履歴付き** |
 | `accept.py` | 変更履歴をすべて承諾した版にする（承諾後の本文の確認や、きれいな版づくりに使う） |
 | `view.py` | 本文を段落ごとに表示する（`redline`／`changed`／`accept`） |
 | `make_reply.py` | 相手への返信メールの本文（プレーンテキストと HTML）を、changes JSON から作る。修正点の理由は、契約書の相手向けコメントの文をそのまま使う。**メール本文の修正点は、この道具で作る。手で書かない** |
@@ -86,8 +86,9 @@ curl -s -X PATCH -H "Authorization: Bearer $T_" \
 
 # 9. specs/legal-001 の「送る前のゲート」を通す（文書のプロパティ・社内向けの混入・承諾後の本文・添付名）。
 #    相手に送るのは清書。redline.docx（履歴付き）は社内用の gdoc に取り込むだけにする
-cp -R $W/work $W/clean && python3 -I $T/make_clean.py $W/clean --date <changes JSON の date>
-(cd $W/clean && zip -qXrDy ../clean.docx .)
+#    1つのコマンドで、反映・コメント外し・情報消し・検査・圧縮までする。検査に通らなければ終了コード 1 で止まり、
+#    clean.docx は残らない（前からあったものも消す）。$W/work は書き換えない。手で zip しない
+python3 -I $T/make_clean.py $W/work --out $W/clean.docx --date <changes JSON の date>
 #    清書を PDF に書き出して目で確かめる（下線の残り・署名欄の折れ）。通ったら、clean.docx を
 #    <契約フォルダ名>_vX.Y.Z_Axla Comments.docx として契約フォルダに置く
 
@@ -241,4 +242,5 @@ C=loop/legal/contracts/<契約 ID>
 - `word/comments.xml`：`w:date` と、`comment.py` が乱数で振る `w14:paraId`／`w14:textId` を除けば一致する。
 - `make_reply.py`：同じ JSON から2回作り、プレーンテキストと HTML が1文字も違わないこと。相手向けのコメントが、すべてメール本文に入っていること（入っていなければ止まる）。
 - 清書（`make_clean.py`）：同じ JSON と `--date` から2回作り、すべての部品がバイト単位で同じこと。変更履歴・コメントが 0 であること。
+- 自動テスト：`python3 -I -m unittest discover -s "$T/tests"`（作り話の契約書で、清書が通る例と止まる例を確かめる）。
 - 違ってよいのは、コメントの4つの部品（`comments.xml`・`commentsExtended.xml`・`commentsExtensible.xml`・`commentsIds.xml`）の日時と乱数の ID だけ。

@@ -5,9 +5,10 @@
 
 - 削除（w:del）は中身ごと消し、追加（w:ins）は印だけ外す。
 - 段落の印が削除で、承諾後に文字が残らない段落は、段落ごと消す。
-- settings.xml の変更履歴の記録（trackRevisions）を外す。
+- settings.xml の変更履歴の記録（trackRevisions）を外す（settings.xml が無ければ飛ばす）。
 コメントは残る。
 """
+import os
 import re
 import sys
 
@@ -34,6 +35,7 @@ x = re.sub(r'<w:ins [^>]*>(.*?)</w:ins>', r'\1', x, flags=re.S)
 x = x.replace('<w:rPr></w:rPr>', '')
 open(f, 'w', encoding='utf-8').write(x)
 s = d + '/word/settings.xml'
-y = open(s, encoding='utf-8').read()
-open(s, 'w', encoding='utf-8').write(y.replace('<w:trackRevisions/>', ''))
+if os.path.exists(s):  # Word 以外のソフトで作った文書には、settings.xml が無いことがある
+    y = open(s, encoding='utf-8').read()
+    open(s, 'w', encoding='utf-8').write(y.replace('<w:trackRevisions/>', ''))
 print('ok')
