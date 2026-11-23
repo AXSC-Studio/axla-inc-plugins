@@ -20,6 +20,8 @@
 | `update_partners.py` | 状態ストア・検証器 | 相手の台帳（番号だけ）を進める。会場の確定で G2 を記録。返事待ちの超過・古い下書き（【古い】）を見つける |
 | `apps-script/watch_partner_mail.gs` | 起動トリガー（Trigger） | 相手の返事と、相手のドメイン宛の送信済みを拾い、種類とスレッド ID だけをルーティンへ送る（1分ごと） |
 | `match_partner.py` | — | アドレスを相手の番号に手元で引き当てる（names.local は外に出さない） |
+| `count_roster.py` | 検証器（Verifier） | 名簿から申し込み・来場・同意の件数だけを台帳に入れる。`--delete` で名簿を消す |
+| `close_event.py` | 終了条件（Exit Criteria）・起動トリガー | 撤収の確認・精算・お礼の送信の3つがそろったらイベントを閉じ、外側を起こす。お礼の下書きは来場者だけ宛て |
 | `eventops_lib.py` | — | 上の道具が共有する部品（置き場・runs.jsonl・checklist） |
 
 ## 道具の分け方
