@@ -7,7 +7,7 @@ description: Part of Axla Legal, normally called from /axla-legal:loop. After th
 
 道具：`${CLAUDE_PLUGIN_ROOT}/scripts`。決まりは spec の「送る前のゲート」。柵（Hook）が飛ばしを止める。
 
-1. 清書：`make_clean.py <work> --out <W>/clean.docx --date <date> --record <記録フォルダ>`。PDF に書き出して1回だけ目で確かめ、Drive の契約フォルダに `…_vX.Y.Z_<自社名> Comments.docx` で置く。
+1. 清書：`make_clean.py <work> --out <W>/clean.docx --date <date> --record <記録フォルダ>`。PDF に書き出して1回だけ目で確かめ（Word か LibreOffice で書き出す。無い環境では、項番号の自動採番や表の見た目が再現されないので、人が Word などで確かめる）、Drive の契約フォルダに `…_vX.Y.Z_<自社名> Comments.docx` で置く。
 2. 返信文：`make_reply.py "<記録フォルダ>/Redline Data.json" --out-text <W>/reply.txt --out-html <W>/reply.html --record <記録フォルダ>`。手で書かない。
 3. 下書き：Gmail のつながりの `create_draft`（`replyToMessageId` で相手のメールのスレッドへの返信。`body`＝reply.txt、`htmlBody`＝reply.html。添付なし）。つながりが相手のメールを引用として付け、その中に画像が入る。
 4. **すぐに同じ下書きを `update_draft`**（`draftId`、`htmlBody`＝reply.html、`body`＝reply.txt）。reply.html の最後の短い引用の枠があるので、相手のメールの引用（画像入り）は付き直らず、スレッドの中の返信のまま画像が消える（Issue #12）。

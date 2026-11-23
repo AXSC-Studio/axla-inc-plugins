@@ -8,7 +8,8 @@ gate.json は利用側の `loop/legal/contracts/<契約 ID>/gate.json` に置く
         相手の宛先・スレッド・メッセージを登録する（入口で1回。返事が別スレッドで来たら足す）。
     python3 -I gate.py status <契約の記録フォルダ>
         ゲートの記録を表示する。
-    python3 -I gate.py mark <契約の記録フォルダ> <approval|gdoc|signed|dropped|learned> [--id <gdoc の ID>] [--note ...]
+    python3 -I gate.py mark <契約の記録フォルダ> <approval|gdoc|signed|dropped|learned|g1|g1_answered> [--id <gdoc の ID>] [--note ...]
+        g1 は人に聞く論点があるとき（答えが出るまで入口が止まる）、g1_answered は代表が答えたとき。
         段階が済んだことを記録する（loop.py が次の1歩を決めるのに使う）。approval（代表の最終 OK）・signed・dropped は
         人間ゲートなので、代表がチャットで言ったときだけ付ける。gdoc は社内 gdoc を作ったとき（--id にその ID）。
         approval と gdoc には、そのときの Redline Data.json の時刻を一緒に残す（あとで直しが変われば、やり直しになる）。
@@ -98,7 +99,7 @@ def find_root(start):
         d = up
 
 
-CONFIG_KEYS = ('our_party_name', 'author', 'initials', 'doc_label', 'ai_usage')
+CONFIG_KEYS = ('our_party_name', 'author', 'initials', 'doc_label', 'ai_usage', 'our_registered_address', 'our_representative')
 
 
 def load_config(start):
@@ -141,7 +142,7 @@ def main():
     s.add_argument('cdir')
     mk = sub.add_parser('mark')
     mk.add_argument('cdir')
-    mk.add_argument('what', choices=['approval', 'gdoc', 'signed', 'dropped', 'learned'])
+    mk.add_argument('what', choices=['approval', 'gdoc', 'signed', 'dropped', 'learned', 'g1', 'g1_answered'])
     mk.add_argument('--id')
     mk.add_argument('--note')
     args = ap.parse_args()
@@ -156,7 +157,15 @@ def main():
             rec['note'] = args.note
         if args.what == 'gdoc' and not args.id:
             sys.exit('gdoc には --id（作った gdoc の ID）が要る')
-        update(args.cdir, args.what, rec)
+        if args.what == 'g1':  # 人に聞く論点がある（答えが出るまで、入口は止まる）
+            rec['open'] = True
+            update(args.cdir, 'g1', rec)
+        elif args.what == 'g1_answered':  # 代表が答えた（--note に答えの要点。相手の名前・条文は書かない）
+            g = load(args.cdir).get('g1', {})
+            g.update({'open': False, 'answered_at': rec['at'], 'answer': args.note or ''})
+            update(args.cdir, 'g1', g)
+        else:
+            update(args.cdir, args.what, rec)
         print(f'ok: {args.what} を記録した')
         return
     if args.cmd == 'watch':
