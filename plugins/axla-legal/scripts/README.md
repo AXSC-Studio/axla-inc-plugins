@@ -21,6 +21,7 @@
 | `make_loop_log.py` | Loop Log を gdoc にしていたときの道具（JSON から HTML を作る）。いまの Loop Log は `loop/legal/contracts/<契約 ID>/loop-log.md` に直接書くので、付録（境目の版と最新の直しの違う段落）を作りたいときだけ使う |
 | `gate.py` | 契約ごとのゲートの記録（`$C/gate.json`）を読み書きする。入口で相手の宛先・スレッド・メッセージを登録する（`watch`）。Hook（`hooks/guard.py`）はこの記録で、送信・下書き・LEGAL.md の書き換えなどを止める（[docs/guardrails.md](../docs/guardrails.md)） |
 | `budget.py` | 予算（回数・日数・トークン・時間の上限）。上限は利用側の `loop/legal/budget.json`（無ければ「上限なし」）。`cycle` で内側のループの周回を数え、`check` が予算切れなら終了コード 3 で止まる |
+| `check_refs.py` | 承諾後の本文で、条・項の参照（第N条・第N条第M項・前条・前項）の指す先があるかを機械で確かめる。誤りは【致命的】として、検証役と同じ形で出す |
 | `count_findings.py` | 検証役の出力から【致命的】【重要】【軽微】の数を数え直し、合否を出す（致命的があれば終了コード 1、件数が合わなければ 2） |
 | `outer_loop.py` | 外側のループ：Loop Log の「学び」を集める（`collect`）、LEGAL.md の世代を上げる（`bump`。`legal-outer/` のブランチだけ） |
 | `tests/` | 作り話の契約書で、道具と柵が止める例と通る例を確かめるテスト |
@@ -77,6 +78,8 @@ $W/venv/bin/python $SK/office/validate.py $W/redline.docx --original $W/original
 
 #    内側のループを1周回すたびに数える（その送付の中＝Y が同じ間で数える）。予算切れなら終了コード 3 → 司令塔に上げる
 #    合否は、検証役の出力（$W/review-*.md に保存）を道具で数え直して決める
+#    条・項の参照は機械でも確かめる（誤りは必ず致命的）
+python3 -I $T/check_refs.py $W/work --out $W/review-refs.md
 python3 -I $T/count_findings.py $W/review-*.md
 python3 -I $T/budget.py cycle $C --version vX.Y.Z && python3 -I $T/budget.py check $C
 
