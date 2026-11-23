@@ -333,7 +333,6 @@ axla-inc-plugins/plugins/axla-legal/        … 道具（このプラグイン�
 
 ## Open Questions
 
-- `comment.py` を同梱せず、docx スキルから呼ぶ形でよいか（scripts/README.md の「入手先」）。
 - 署名前の確認のスクショ（AI の設定）を、契約ごとの `loop/legal/contracts/<契約 ID>/` に置くか、全契約で共通の場所に置くか。
 
 ## 検証役への指示文

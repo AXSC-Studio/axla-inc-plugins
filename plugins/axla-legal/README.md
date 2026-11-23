@@ -12,9 +12,8 @@ A Claude Code plugin that runs a contract you received (starting with NDAs) from
 
 ## Requirements
 - **Claude Code** (terminal, desktop or IDE). It does not run in a claude.ai chat: the tools run locally.
-- **Python 3.13** with `defusedxml` and `lxml` in a virtual environment (`scripts/requirements.txt`), and **git**.
+- **Python 3.13** (standard library only; no virtual environment or extra packages) and **git**.
 - **Google Drive and Gmail connectors** in Claude, for the original, the internal Google Doc and reply drafts.
-- The `docx` skill (Anthropic) for `comment.py` and `validate.py` (see `scripts/README.md`, "comment.py").
 - Built for **Japanese-language contracts (.docx) and Japanese business practice**. Unlike a general legal-review plugin, it edits the .docx itself and enforces the pre-send checks with hooks.
 
 ## Install
@@ -96,9 +95,8 @@ MIT
 
 ### 前提
 - **Claude Code**（端末・デスクトップ・IDE）。claude.ai のチャットでは動かない（道具を手元で動かすため）。
-- **Python 3.13** と、仮想環境の `defusedxml`・`lxml`（`scripts/requirements.txt`）、**git**。
+- **Python 3.13**（標準ライブラリだけ。仮想環境もほかの部品も要らない）と **git**。
 - Claude の **Google ドライブと Gmail のつながり**（原本・社内用の Google ドキュメント・返信の下書きのため）。
-- Anthropic の `docx` スキル（`comment.py` と `validate.py`。`scripts/README.md` の「comment.py の入手先」）。
 - **日本語の契約（.docx）と日本の実務向け**。一般の法務レビューのプラグインと違い、.docx そのものを直し、送る前の確認を Hook で止める。
 
 ### 入れ方

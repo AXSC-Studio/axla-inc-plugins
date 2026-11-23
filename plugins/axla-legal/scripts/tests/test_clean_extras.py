@@ -100,41 +100,85 @@ class TestCleanExtras(unittest.TestCase):
         self.assertIn('usage', r.stderr)
         self.assertNotIn('IndexError', r.stderr)
 
-    def test_add_comments_missing_paragraph_writes_nothing(self):
-        d = base.make_unpacked(self.root)
-        fake = os.path.join(self.root, 'comment.py')
-        with open(fake, 'w') as f:
-            f.write('import sys; sys.exit(0)\n')
-        ch = os.path.join(self.root, 'c.json')
-        with open(ch, 'w', encoding='utf-8') as f:
-            json.dump({'author': 'T', 'comments': [{'start': 'NOPE0001', 'text': 'x'}]}, f)
-        with open(os.path.join(d, 'word/document.xml'), encoding='utf-8') as f:
-            before = f.read()
-        r = run('add_comments.py', d, ch, '--comment-py', fake)
-        self.assertNotEqual(r.returncode, 0)
-        self.assertIn('NOPE0001', r.stderr)
-        with open(os.path.join(d, 'word/document.xml'), encoding='utf-8') as f:
-            self.assertEqual(before, f.read())
-
-    def test_add_comments_failure_in_comment_py_writes_nothing(self):
+    def with_para(self):
         d = base.make_unpacked(self.root)
         with open(os.path.join(d, 'word/document.xml'), encoding='utf-8') as f:
             x = f.read()
         with open(os.path.join(d, 'word/document.xml'), 'w', encoding='utf-8') as f:
             f.write(x.replace('<w:p>', '<w:p w14:paraId="0000000A" xmlns:w14="w14">', 1))
+        os.remove(os.path.join(d, 'word/comments.xml'))  # コメントの無い原本にする
+        with open(os.path.join(d, 'word/_rels/document.xml.rels'), 'w', encoding='utf-8') as f:
+            f.write('<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>')
         with open(os.path.join(d, 'word/document.xml'), encoding='utf-8') as f:
-            before = f.read()
-        fake = os.path.join(self.root, 'comment.py')
-        with open(fake, 'w') as f:
-            f.write('import sys; print("boom", file=sys.stderr); sys.exit(2)\n')
+            x = f.read()
+        x = x.replace('<w:commentRangeStart w:id="0"/>', '').replace('<w:commentRangeEnd w:id="0"/><w:r><w:commentReference w:id="0"/></w:r>', '')
+        with open(os.path.join(d, 'word/document.xml'), 'w', encoding='utf-8') as f:
+            f.write(x)
+        with open(os.path.join(d, '[Content_Types].xml'), encoding='utf-8') as f:
+            ct = f.read()
+        with open(os.path.join(d, '[Content_Types].xml'), 'w', encoding='utf-8') as f:
+            f.write(ct.replace('<Override PartName="/word/comments.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml"/>', ''))
+        return d
+
+    def changes(self, comments, author='T'):
         ch = os.path.join(self.root, 'c.json')
         with open(ch, 'w', encoding='utf-8') as f:
-            json.dump({'author': 'T', 'comments': [{'start': '0000000A', 'text': 'x'}]}, f)
-        r = run('add_comments.py', d, ch, '--comment-py', fake)
+            json.dump({'author': author, 'initials': 'TT', 'date': '2099-01-01T00:00:00Z', 'comments': comments}, f, ensure_ascii=False)
+        return ch
+
+    def test_add_comments_missing_paragraph_writes_nothing(self):
+        d = self.with_para()
+        with open(os.path.join(d, 'word/document.xml'), encoding='utf-8') as f:
+            before = f.read()
+        r = run('add_comments.py', d, self.changes([{'start': 'NOPE0001', 'text': 'x'}]))
         self.assertNotEqual(r.returncode, 0)
-        self.assertIn('boom', r.stderr)
+        self.assertIn('NOPE0001', r.stderr)
         with open(os.path.join(d, 'word/document.xml'), encoding='utf-8') as f:
             self.assertEqual(before, f.read())
+        self.assertFalse(os.path.exists(os.path.join(d, 'word/comments.xml')))
+
+    def test_add_comments_without_outside_tools(self):
+        # 外のスキルの部品も venv も使わずに、コメントの本体・関係づけ・登録・本文の印を書く（#8・#9）
+        d = self.with_para()
+        r = run('add_comments.py', d, self.changes([{'start': '0000000A', 'text': '理由の1行目\n2行目 & <記号>'}]))
+        self.assertEqual(r.returncode, 0, r.stderr)
+        with open(os.path.join(d, 'word/comments.xml'), encoding='utf-8') as f:
+            com = f.read()
+        self.assertIn('w:author="T"', com)
+        self.assertIn('&amp; &lt;記号&gt;', com)
+        with open(os.path.join(d, 'word/_rels/document.xml.rels'), encoding='utf-8') as f:
+            self.assertIn('Target="comments.xml"', f.read())
+        v = run('validate_docx.py', d)
+        self.assertEqual(v.returncode, 0, v.stdout)
+        # 2回目はその後ろに足し、ID は続きから
+        r = run('add_comments.py', d, self.changes([{'start': '0000000A', 'text': '2件目'}]))
+        self.assertEqual(r.returncode, 0, r.stderr)
+        with open(os.path.join(d, 'word/comments.xml'), encoding='utf-8') as f:
+            self.assertIn('w:id="1"', f.read())
+        self.assertEqual(run('validate_docx.py', d).returncode, 0)
+
+    def test_add_comments_id_collision_stops(self):
+        d = self.with_para()
+        self.assertEqual(run('add_comments.py', d, self.changes([{'start': '0000000A', 'text': 'a'}])).returncode, 0)
+        r = run('add_comments.py', d, self.changes([{'start': '0000000A', 'text': 'b'}]), '--comment-id-start', '0')
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn('ぶつかる', r.stderr)
+
+    def test_validate_finds_broken_comment_pairs(self):
+        d = self.with_para()
+        self.assertEqual(run('add_comments.py', d, self.changes([{'start': '0000000A', 'text': 'a'}])).returncode, 0)
+        os.remove(os.path.join(d, 'word/comments.xml'))
+        v = run('validate_docx.py', d)
+        self.assertEqual(v.returncode, 1)
+        self.assertIn('無い部品', v.stdout)
+
+    def test_validate_refuses_doctype(self):
+        d = self.with_para()
+        with open(os.path.join(d, 'word/styles.xml'), 'w', encoding='utf-8') as f:
+            f.write('<?xml version="1.0"?><!DOCTYPE x [<!ENTITY a "aaaa">]><x>&a;</x>')
+        v = run('validate_docx.py', d)
+        self.assertEqual(v.returncode, 1)
+        self.assertIn('DOCTYPE', v.stdout)
 
     def test_intake_wrong_password_and_bad_zip(self):
         bad = os.path.join(self.root, 'bad.zip')
