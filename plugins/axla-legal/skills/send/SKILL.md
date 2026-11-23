@@ -9,8 +9,9 @@ description: Part of Axla Legal, normally called from /axla-legal:loop. After th
 
 1. 清書：`make_clean.py <work> --out <W>/clean.docx --date <date> --record <記録フォルダ>`。PDF に書き出して1回だけ目で確かめ、Drive の契約フォルダに `…_vX.Y.Z_<自社名> Comments.docx` で置く。
 2. 返信文：`make_reply.py "<記録フォルダ>/Redline Data.json" --out-text <W>/reply.txt --out-html <W>/reply.html --record <記録フォルダ>`。手で書かない。
-3. 下書き：Gmail のつながりの `create_draft`（相手のメールのスレッドへの返信。添付なし・画像なし）。
-4. 検査：`get_draft` を `messageFormat=RAW` で読む。Hook がその場で検査して記録する。NG なら直す（引用の画像は、代表に Gmail の画面で消してもらう）。
-5. 代表に「下書きができた。清書を添付して送ってほしい」と知らせて止まる（人間ゲート「送信」）。
-6. 代表が送ったと言ったら、送信済みのメールを `get_message`（RAW）で読む。Hook が送った後の検査をする。台帳を「相手の返事待ち」にする。
-7. 作業フォルダ（展開した本文・清書・返信文）を消す（`rm -rf <W>`）。本文を手元に残さない。記録フォルダは消さない。
+3. 下書き：Gmail のつながりの `create_draft`（`replyToMessageId` で相手のメールのスレッドへの返信。`body`＝reply.txt、`htmlBody`＝reply.html。添付なし）。つながりが相手のメールを引用として付け、その中に画像が入る。
+4. **すぐに同じ下書きを `update_draft`**（`draftId`、`htmlBody`＝reply.html、`body`＝reply.txt）。reply.html の最後の短い引用の枠があるので、相手のメールの引用（画像入り）は付き直らず、スレッドの中の返信のまま画像が消える（Issue #12）。
+5. 検査：`get_draft` を `messageFormat=RAW` で読む。Hook がその場で検査して記録する（画像 0・添付 0・修正点が reply.txt どおり）。それでも画像が残っていたら、代表に Gmail の画面で引用部分を消してもらい、もう一度 RAW で読む。
+6. 代表に「下書きができた。清書を添付して送ってほしい」と知らせて止まる（人間ゲート「送信」）。代表が添付したら、送る直前にもう一度 RAW で読み、画像 0・添付は清書の1つだけ、を確かめてから「送ってよい」と言う。
+7. 代表が送ったと言ったら、送信済みのメールを `get_message`（RAW）で読む。Hook が送った後の検査をする。台帳を「相手の返事待ち」にする。
+8. 作業フォルダ（展開した本文・清書・返信文）を消す（`rm -rf <W>`）。本文を手元に残さない。記録フォルダは消さない。

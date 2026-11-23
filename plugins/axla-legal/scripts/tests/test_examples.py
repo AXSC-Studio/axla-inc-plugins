@@ -49,6 +49,21 @@ class TestExamples(unittest.TestCase):
             self.assertEqual(r.returncode, 0, r.stderr)
             with open(os.path.join(w, 'reply.txt'), encoding='utf-8') as f:
                 self.assertEqual(f.read().count('（理由）'), 3)
+            # 返信の HTML：画像は無く、最後に短い引用の枠がある（update_draft で相手の引用を付け直させないため。#12）
+            with open(os.path.join(w, 'reply.html'), encoding='utf-8') as f:
+                h = f.read()
+            self.assertNotIn('<img', h)
+            self.assertIn('<blockquote class="gmail_quote"', h)
+            # その HTML と文の下書きは、送る前の検査に通る
+            sys.path.insert(0, SCRIPTS)
+            import base64
+            import check_draft
+            with open(os.path.join(w, 'reply.txt'), encoding='utf-8') as f:
+                txt = f.read()
+            mime = ('Content-Type: multipart/alternative; boundary="b"\r\n\r\n--b\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n'
+                    + txt + '\r\n--b\r\nContent-Type: text/html; charset=utf-8\r\n\r\n' + h + '\r\n--b--\r\n')
+            ok, lines = check_draft.check(base64.urlsafe_b64encode(mime.encode()).decode(), 0, txt)
+            self.assertTrue(ok, lines)
 
 
 if __name__ == '__main__':
