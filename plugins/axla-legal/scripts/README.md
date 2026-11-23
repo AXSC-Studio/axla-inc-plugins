@@ -248,9 +248,9 @@ C=loop/legal/contracts/<契約 ID>
 ## 入口の自動検知（試運転）の設定
 
 1. Gmail にフィルタを作る：`from:<相手のドメイン>` → ラベル「Legal/返信あり」を付ける。
-2. Google Apps Script に `apps-script/notify_reply.gs` を貼る。スクリプトのプロパティに `ROUTINE_TOKEN`（claude.ai のタスク画面で発行した API の合鍵）を人が貼る。コードには書かない。
+2. Google Apps Script に `apps-script/notify_reply.gs` と `apps-script/appsscript.json`（権限を絞る。エディタの設定で「appsscript.json を表示」をオンにして貼る）を置く。スクリプトのプロパティに `ROUTINE_URL`・`ROUTINE_TOKEN`（claude.ai のタスク画面で発行した API の合鍵）を人が貼る。コードには書かない。beta の値が変わったら `ROUTINE_BETA` に貼る。
 3. `install()` を1回だけ手で実行して、1分ごとのトリガーを作る。
-4. 見張りタスクの道具は、Gmail の読む道具だけにする（書き込み系は `disallowed_tools` で禁止。`permitted_tools` では絞れなかった。`allowed_tools` に無い Bash も動いたので、禁止は明示する）。
+4. 見張りタスクは、[routines/reply-watcher.md](../routines/reply-watcher.md) のとおりに設定する（止める道具の一覧とプロンプト）。`permitted_tools` では絞れず、`allowed_tools` に無い Bash も動いたので、禁止は `disallowed_tools` に明示する。設定したら、同じファイルの「試し方」（指示入りのダミーのメール）で確かめる。
 5. 大きいスレッドは get_thread が溢れるので、search と get_message で読む。返事が別スレッドで来ることもある。
 
 ## 再現テスト（道具を直したら必ず）
