@@ -10,6 +10,9 @@ changes JSON の形は README.md を参照。段落は w14:paraId で指す。
 新しく足す段落には、--new-para-id-start（16進8桁）から順に ID を振る（コメントで参照できるように）。
 --author を省くと、changes JSON の "author" を使う。どちらもなければ Axla 側の標準の作成者名「Analy┊Axla Inc.」（区切りは全角の「┊」U+250A）。
 
+Google ドキュメントから書き出した文書の空の包み（タグ goog_rdk_N の w:sdt）は、先に外す（文字は変えない）。
+新しく振る変更履歴の ID と段落の ID が、文書にもとからある ID とぶつかるときは、書く前に止める。
+
 制約：rebuild・substitute・delete は、段落を「ランの文字」だけで組み直す。段落の中にハイパーリンク・ブックマーク・
 タブ・改行・フィールド・コメントの印・図・既存の変更履歴などがあると、それが消えてしまうので、その段落では止める。
 そういう段落は、Word などで手で直すか、insert_after／insert_before で別の段落として足す。
@@ -38,6 +41,33 @@ args.date = args.date or spec.get('date') or datetime.datetime.now(datetime.time
 if not args.author:
     sys.exit('作成者がない：--author か、changes JSON の "author" を指定する')
 x = open(D, encoding='utf-8').read()
+
+
+def all_text(s):
+    return ''.join(re.findall(r'<w:(?:t|delText)(?: [^>]*)?>([^<]*)</w:(?:t|delText)>', s))
+
+
+# Google ドキュメントから書き出した文書は、段落の中のランが空の印（タグ goog_rdk_N の w:sdt）で包まれている。
+# 入力欄ではない（id と tag だけ）ので、包みだけを外す。中の文字と書式は残し、前後で文字が同じことを確かめる。
+GOOG_SDT = re.compile(r'<w:sdt>\s*<w:sdtPr>\s*(?:<w:id w:val="-?\d+"/>\s*)?<w:tag w:val="goog_rdk_\d+"/>\s*'
+                      r'(?:<w:id w:val="-?\d+"/>\s*)?</w:sdtPr>\s*(?:<w:sdtEndPr/>\s*)?<w:sdtContent>'
+                      r'((?:(?!<w:sdt[ >]).)*?)</w:sdtContent>\s*</w:sdt>', re.S)
+before = all_text(x)
+x, n_goog = GOOG_SDT.subn(lambda m: m.group(1), x)
+if all_text(x) != before:
+    sys.exit('Google の包みを外したら文字が変わった。止める（文書は書き換えていない）')
+if n_goog:
+    print(f'Google ドキュメントの空の包み（goog_rdk）を {n_goog} 個外した')
+
+# 新しく振る ID が、文書にもとからある ID とぶつからないことを確かめる（ぶつかると Word が壊れたと言う）
+_used_rev = {int(v) for v in re.findall(
+    r'<w:(?:ins|del|moveFrom|moveTo|\w+Change|comment(?:RangeStart|RangeEnd|Reference)?)\b[^>]*\bw:id="(\d+)"', x)}
+_used_pid = {v.upper() for v in re.findall(r'w14:paraId="([0-9A-Fa-f]{8})"', x)}
+if any(v > args.rev_id_start for v in _used_rev):
+    sys.exit(f'--rev-id-start {args.rev_id_start} より大きい変更履歴・コメントの ID がもうある'
+             f'（最大 {max(_used_rev)}）。それより大きい値を渡す')
+if any(int(v, 16) > int(args.new_para_id_start, 16) for v in _used_pid if int(v, 16) < 0x80000000):
+    sys.exit(f'--new-para-id-start {args.new_para_id_start} より大きい段落の ID がもうある。それより大きい値を渡す')
 _id = [args.rev_id_start]
 _pid = [int(args.new_para_id_start, 16)]
 
