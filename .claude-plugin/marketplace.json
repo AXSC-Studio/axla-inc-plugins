@@ -29,11 +29,12 @@
     {
       "name": "axla-marketing",
       "source": "./plugins/axla-marketing",
-      "description": "Turn the notes of a solo Google Meet into a draft article and an eye-catch image",
+      "description": "Marketing desk: turn a solo Google Meet into a draft article (meeting-to-article), and run an in-person event you host (event-ops, specs only)",
       "category": "marketing",
       "keywords": [
         "marketing",
-        "content"
+        "content",
+        "events"
       ],
       "author": {
         "name": "Axla Inc.",

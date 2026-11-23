@@ -1,4 +1,4 @@
-# marketing-001 · turn meeting into article
+# 001 · turn meeting into article
 > 一人の Google Meet でしゃべった Gemini メモを、熱が冷める前にサイトの記事の下書きとアイキャッチにする決まり。道具はこのプラグイン、利用側のデータ（設定・用語集・トーンの見本）は利用側の `loop/marketing/` に分ける
 
 **実装対象**: scripts/（道具）・prompts/（指示文）・利用側の loop/marketing/（meeting-to-article.json・glossary.md・tone/）
