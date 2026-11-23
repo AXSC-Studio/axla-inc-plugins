@@ -1,2 +1,1 @@
-defusedxml
-lxml
+# 依存する部品は無い（Python 3.13 の標準ライブラリだけで動く。Issue #8・#9）

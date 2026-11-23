@@ -10,7 +10,8 @@
 | ファイル | 役割 |
 |---|---|
 | `redline.py` | changes JSON の `changes` を、変更履歴として `word/document.xml` に入れる。Google ドキュメントから書き出した雛形の空の包み（`goog_rdk`）は先に外す（文字は変えない）。新しい ID がもとの ID とぶつかるときは、書く前に止まる |
-| `add_comments.py` | changes JSON の `comments` を、Word のコメントとして入れる（本体は `comment.py`。下の「入手先」） |
+| `add_comments.py` | changes JSON の `comments` を、Word のコメントとして入れる（標準ライブラリだけ。外の部品を使わない） |
+| `validate_docx.py` | 展開済みか .docx の形式を確かめる（XML・関係づけ・コメントの対応・変更履歴の ID） |
 | `check_draft.py` | Gmail の下書き（送った後は送信済みのメール）を調べる。HTML の `<img>`、画像のパーツ、添付の数、修正点が make_reply.py の出力どおりかを見て、違えば止まる |
 | `intake_ppap.py` | パスワード付き zip（PPAP）で届いた契約書を展開する。パスワードは標準入力か入力欄で受け、表示も保存もしない（引数にしない）。中身が .docx 1つでなければ止まる |
 | `make_clean.py` | 相手に送る**清書**の .docx を作る。変更をすべて反映し、コメント・作成者などの情報・付随の情報（customXml・サムネイル・テンプレートのパス・文書の変数・rsid）を消す。本文・ヘッダー・フッター・脚注まで、清書になっているかを自分で確かめてから圧縮する。通らなければ清書を作らない。**相手に送るのは清書、社内の gdoc は履歴付き** |
@@ -36,22 +37,18 @@
 
 ```bash
 T=<道具のフォルダの絶対パス>        # 例：SKILL.md に出ている …/axla-legal/<版>/scripts
-python3.13 -m venv <作業フォルダ>/venv
-<作業フォルダ>/venv/bin/pip install -r "$T/requirements.txt"
 ```
+
+- 道具は **Python 3.13 の標準ライブラリだけ**で動く（Issue #8・#9）。venv も、ほかのスキルの部品も要らない。
 
 - 契約ごとの記録（changes JSON の `Redline Data.json`、`loop-log.md`）は、利用側のリポジトリの `loop/legal/contracts/<契約 ID>/` に置く（git に入れない。使う側のリポジトリの .gitignore に `loop/legal/contracts/` の1行が要る。無ければ gate.py を使う道具が書く前に止まる）。下の `C` がこのフォルダ。
 - .docx を展開したり作ったりする作業フォルダ `W` は、scratchpad など使い捨ての場所でよい。最後に残すもの（JSON・Loop Log）は `C` に置き、scratchpad だけに残さない。
 - 外から来た .docx は信用しないデータとして扱う。展開は `zipfile` で行い（`unzip` は使わない）、スクリプトはパスを引数で渡して `python -I` で動かす。
 
-### comment.py の入手先
+### コメントと形式の検査（外の部品を使わない）
 
-`add_comments.py` は、Claude の docx スキル（Anthropic の `anthropic-skills:docx`）に付いている `scripts/comment.py` を呼びます。
-
-- 出どころ：docx スキルのフォルダの `scripts/comment.py`。Claude Code のデスクトップ版では、`~/Library/Application Support/Claude/local-agent-mode-sessions/skills-plugin/<…>/skills/docx/scripts/comment.py` にある。
-- ライセンス：スキルのフォルダに Apache License 2.0 の `LICENSE.txt` がある。ただし著作権者の表記はない。また `comment.py` は、同じスキルの `office/helpers` とテンプレートにも依存している。
-- 扱い：出どころとライセンスがはっきりしないため、**このリポジトリには同梱しない**。使うときは、スキルのパスを `--comment-py` に渡す。
-- 形式の検査：同じスキルの `scripts/office/validate.py` を使う（下の手順 5）。
+- コメントは `add_comments.py` が、Word の決まり（OOXML）どおりに `word/comments.xml`・関係づけ・Content_Types の登録・本文の印を書く。以前は docx スキルの `comment.py` を呼んでいたが、出どころとライセンスがはっきりせず、版も固定できないので、自前で書き直した（Issue #8）。Google ドキュメントに取り込んでも、コメントと作成者名が残ることを確かめてある（2026-11-23）。
+- 形式の検査は `validate_docx.py`（XML として読めるか、関係づけの指す先、コメントの印と本体の対応、変更履歴の ID の重なり）。
 
 ## 実行の順番
 
@@ -61,26 +58,25 @@ python3.13 -m venv <作業フォルダ>/venv
 T=<道具のフォルダの絶対パス>       # 上の「準備」。作業は利用側のリポジトリで行う
 W=<作業フォルダ>                 # 使い捨て（展開・作った .docx）
 C=loop/legal/contracts/<契約 ID>      # 記録（Redline Data.json・loop-log.md）。git に入れない
-SK=<docx スキルの scripts フォルダ>
 
 # 0. 入口で1回：相手の宛先と、届いたメールのスレッド・メッセージを登録する（Hook がこれで相手へのメールを見分ける）
 python3 -I $T/gate.py watch $C --to <相手のアドレス> --thread <threadId> --message <messageId>
 
 # 1. 原本を展開する（Drive の <契約フォルダ名>_vX.1.0_<相手> Original.docx）
 python3 -I -c "import sys,zipfile; zipfile.ZipFile(sys.argv[1]).extractall(sys.argv[2])" $W/original.docx $W/work
-rm -rf "$W/work/[trash]"        # どこからも参照されていない古い部品があれば消す（validate.py が教えてくれる）
+rm -rf "$W/work/[trash]"        # どこからも参照されていない古い部品があれば消す
 
 # 2. 段落の ID を調べて、changes JSON を書く（view.py や、下の「段落の ID の調べ方」）
 
 # 3. 変更履歴を入れる
 python3 -I $T/redline.py $W/work "$C/Redline Data.json"            # 作成者は JSON の "author"（--author で上書きできる）
 
-# 4. コメントを入れる（comment.py が defusedxml を使うので venv の python）
-$W/venv/bin/python $T/add_comments.py $W/work "$C/Redline Data.json" --comment-py $SK/comment.py   # 作成者・頭文字は JSON から。コメントの ID は既存の最大＋1 から
+# 4. コメントを入れる（作成者・頭文字は JSON か config.json から。コメントの ID は既存の最大＋1 から）
+python3 -I $T/add_comments.py $W/work "$C/Redline Data.json"
 
 # 5. 再圧縮して、形式を検査する
+python3 -I $T/validate_docx.py $W/work
 (cd $W/work && zip -qXrDy ../redline.docx .)
-$W/venv/bin/python $SK/office/validate.py $W/redline.docx --original $W/original.docx --author "<作成者名>"
 
 #    内側のループを1周回すたびに数える（その送付の中＝Y が同じ間で数える）。予算切れなら終了コード 3 → 司令塔に上げる
 #    合否は、検証役の出力（$W/review-*.md に保存）を道具で数え直して決める
@@ -185,7 +181,7 @@ EOF
 - `add_comments.py` のコメントの ID は、原本にある既存のコメントの ID の最大＋1 から振る（`--comment-id-start` で指定もできる）。
 - `insert_after`／`insert_before` で足した段落には、`--new-para-id-start`（既定 `1A000000`）の次の番号から順に `w14:paraId` が振られる（`1A000001`、`1A000002`、…）。コメントの `start`／`end` には、この番号を使える。
 - 変更履歴の `w:id` は `--rev-id-start`（既定 9000）の次から振る。原本の既存の ID とぶつからないようにする。
-- `--date` を省くと、changes JSON の `"date"`、それもなければ実行時刻（UTC）になる。送った版で使った日時を `"date"` に残しておけば、同じ JSON から毎回同じ `document.xml` ができる（再現できる）。コメントの日時と ID は `comment.py` が実行のたびに振る。
+- `--date` を省くと、changes JSON の `"date"`、それもなければ実行時刻（UTC）になる。送った版で使った日時を `"date"` に残しておけば、同じ JSON から毎回同じ `document.xml` ができる（再現できる）。コメントの日時も同じ `"date"` を使い、ID は既存の最大＋1 から振るので、コメントの部品も毎回同じになる。
 
 ### ダミーの例（契約とは関係のない作り話）
 
@@ -262,7 +258,7 @@ C=loop/legal/contracts/<契約 ID>
 1件目の送付版で確かめた手順。Drive の `_vX.1.0_<相手> Original.docx` と `loop/legal/contracts/<契約 ID>/Redline Data.json` から作り直し、送った `_vX.Y.Z_<自社名> Comments.docx` と比べる。
 
 - `word/document.xml`：同じ `--date` なら、バイト単位で一致する（2026-11-16 に確認）。
-- `word/comments.xml`：`w:date` と、`comment.py` が乱数で振る `w14:paraId`／`w14:textId` を除けば一致する。
+- `word/comments.xml`：同じ JSON（`date` を含む）からは、バイト単位で一致する（乱数の ID は使わない）。
 - `make_reply.py`：同じ JSON から2回作り、プレーンテキストと HTML が1文字も違わないこと。相手向けのコメントが、すべてメール本文に入っていること（入っていなければ止まる）。
 - 清書（`make_clean.py`）：同じ JSON と `--date` から2回作り、すべての部品がバイト単位で同じこと。変更履歴・コメントが 0 であること。
 - 自動テスト：`python3 -I -m unittest discover -s "$T/tests"`（作り話の契約書で、清書が通る例と止まる例を確かめる）。
