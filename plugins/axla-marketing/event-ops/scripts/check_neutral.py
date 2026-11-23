@@ -2,7 +2,7 @@
 """公開リポの event-ops/ に、特定の会社・人の情報が入っていないかの検査（CI）。spec 002。
 
 見つけたら exit 1。
-- メールアドレス（example.com / example.org / example.net と noreply を除く）
+- メールアドレス（example.com / example.org / example.net、見本用の .example・.test・.invalid、noreply を除く）
 - 電話番号
 - 会社の形（日本の会社の種類・社団や財団の法人・英語圏の会社の略称。並びは COMPANY を見る）
 - 秘密の語の一覧：環境変数 NEUTRAL_DENYLIST（1行1語。GitHub の Secrets に置く。語そのものは出力しない）
@@ -24,6 +24,8 @@ COMPANY = re.compile("(" + "|".join([
     r"Co\.,?\s*" + "Ltd", r"\b" + "Inc" + r"\.", r"\b" + "LL" + "C" + r"\b", r"\b" + "Gm" + "bH" + r"\b",
 ]) + ")")
 ALLOWED_DOMAINS = {"example.com", "example.org", "example.net"}
+# 見本用に予約されたドメイン（RFC 2606）。本物の宛先にはならない
+RESERVED_TLDS = (".example", ".test", ".invalid", ".localhost")
 TEXT_SUFFIXES = {".md", ".py", ".json", ".gs", ".sh", ".txt", ".csv", ".yml", ".yaml", ".html", ".js", ".ts"}
 
 
@@ -43,7 +45,8 @@ def main():
         for lineno, line in enumerate(text.splitlines(), 1):
             for m in EMAIL.finditer(line):
                 dom = m.group(1).lower()
-                if dom not in ALLOWED_DOMAINS and not m.group(0).lower().startswith("noreply@"):
+                reserved = dom in ALLOWED_DOMAINS or dom.endswith(RESERVED_TLDS)
+                if not reserved and not m.group(0).lower().startswith("noreply@"):
                     findings.append(f"{f}:{lineno} メールアドレス（{dom}）")
             if PHONE.search(line):
                 findings.append(f"{f}:{lineno} 電話番号")

@@ -18,6 +18,8 @@
 | `make_eyecatch.py` | — | 文字だけのアイキャッチ（外の API を呼ばない。Pillow が要る） |
 | `freeze_kit.py` | 状態ストア（State Store） | 送る版を凍結（URL と中身のハッシュ）。同じ URL で中身が違えば止める。ハッシュを approve.py に渡す |
 | `update_partners.py` | 状態ストア・検証器 | 相手の台帳（番号だけ）を進める。会場の確定で G2 を記録。返事待ちの超過・古い下書き（【古い】）を見つける |
+| `apps-script/watch_partner_mail.gs` | 起動トリガー（Trigger） | 相手の返事と、相手のドメイン宛の送信済みを拾い、種類とスレッド ID だけをルーティンへ送る（1分ごと） |
+| `match_partner.py` | — | アドレスを相手の番号に手元で引き当てる（names.local は外に出さない） |
 | `eventops_lib.py` | — | 上の道具が共有する部品（置き場・runs.jsonl・checklist） |
 
 ## 道具の分け方
