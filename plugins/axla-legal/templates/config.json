@@ -4,5 +4,7 @@
   "author": "<変更履歴とコメントの作成者名（例：Reviewer┊Sample Studio）>",
   "initials": "<作成者の頭文字（例：SS）>",
   "doc_label": "<ファイル名に入れる自社名（例：Sample Studio → F_v0.2.3_Sample Studio Comments）>",
-  "ai_usage": "<自社の生成 AI の使い方（例：Claude の法人向けプランを、学習しない設定で業務に使う）>"
+  "ai_usage": "<自社の生成 AI の使い方（例：Claude の法人向けプランを、学習しない設定で業務に使う）>",
+  "our_registered_address": "<任意：登記上の本店（当事者の表示に使う。無ければ G1 で聞く）>",
+  "our_representative": "<任意：代表者の肩書と名前（例：代表社員 見本 花子）>"
 }

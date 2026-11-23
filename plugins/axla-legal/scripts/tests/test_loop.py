@@ -104,6 +104,17 @@ class TestLoop(unittest.TestCase):
         gate.update(self.c, 'sent', {'checked_ok': False})
         self.assertEqual(nxt(self.c), 'INCIDENT')
 
+    def test_open_g1_stops_until_answered(self):
+        os.makedirs(self.c)
+        run('gate.py', 'watch', self.c, '--to', 'legal@partner.example.test')
+        self.touch_redline()
+        self.review('\n致命的 0件・重要 0件・軽微 0件\n')
+        self.assertEqual(nxt(self.c), 'gdoc')
+        run('gate.py', 'mark', self.c, 'g1', '--note', '条件付き 5か所（第2・5・8・9条）')
+        self.assertEqual(nxt(self.c), '人（G1）')
+        run('gate.py', 'mark', self.c, 'g1_answered', '--note', '歩み寄りは入れない')
+        self.assertEqual(nxt(self.c), 'gdoc')
+
     def test_budget_exhausted_goes_to_g1(self):
         os.makedirs(self.c)
         run('gate.py', 'watch', self.c, '--to', 'legal@partner.example.test')

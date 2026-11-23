@@ -16,6 +16,7 @@
     review              最後の直しのあとに、検証が通っていない
     gdoc                最後の直しのあとに、社内 gdoc を作っていない（内側のループの最後に1回だけ作る）
     人（最終 OK）        代表が gdoc を見て「最終 OK」を出すのを待つ（gate.py mark approval）
+    人（G1）            人に聞く論点がある（gate.py mark g1）。答え（gate.py mark g1_answered）が出るまで、どの段階でも止まる
     send                清書・返信文・下書き・下書きの検査のどれかが済んでいない
     人（送信）           代表が Gmail の画面で清書を添付して送るのを待つ
     INCIDENT            送ったメールの検査が NG
@@ -70,6 +71,11 @@ def decide(cdir):
     over = budget_exhausted(cdir)
     if over:
         return step('G1', over, '止まる。Loop Log の「いまの状態」と台帳の状態に書き、代表に知らせる', human=True)
+    g1 = g.get('g1', {})
+    if g1.get('open'):
+        return step('人（G1）', '人に聞く論点がある：' + (g1.get('note') or '（Loop Log を見る）'),
+                    '代表に論点を3行で知らせて止まる。答えが出たら gate.py mark g1_answered --note <答えの要点> で記録し、'
+                    'Loop Log の「G1 の答え」に書いてから、もう一度入口へ', human=True)
     if not g.get('watch'):
         return step('intake', '相手の宛先・スレッドが登録されていない（契約の受け取りがまだ）',
                     '原本を受け取り、契約 ID と台帳の1行を作り、gate.py watch で相手を登録する')
