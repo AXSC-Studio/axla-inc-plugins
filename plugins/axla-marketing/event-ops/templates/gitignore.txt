@@ -1,0 +1,3 @@
+# 使う側のリポの .gitignore に足す（event-ops）
+loop/marketing/event-ops/names.local
+loop/marketing/event-ops/events/

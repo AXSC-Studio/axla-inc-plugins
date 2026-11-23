@@ -1,0 +1,8 @@
+{
+  "event": "{{EVENT_ID}}",
+  "stage": "inner",
+  "inner_active": false,
+  "round": 0,
+  "max_rounds": 3,
+  "g2_confirmed": false
+}

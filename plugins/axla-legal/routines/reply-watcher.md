@@ -2,6 +2,15 @@
 
 claude.ai のクラウドのタスク（ルーティン）に、次をそのまま設定する。**試験中の機能（Routine API の beta）を使うので、予告なく動かなくなることがある。** 動かなくても、毎朝の予備の起動と、人が Gmail を見ることで拾う。
 
+## 0. 設定の手順（代表が行う。5分）
+1. claude.ai の「タスク（ルーティン）」で、新しいタスクを作る。Gmail のつながりを有効にする（Drive は要らない）。
+2. タスクの「止める道具（disallowed_tools）」に、下の「1. 道具の制限」の一覧を貼る。`<Gmail のサーバー名>`・`<Drive のサーバー名>` は、タスクの画面に出るつながりの名前に置き換える。
+3. タスクの「プロンプト」に、下の「2. プロンプト」のコードの枠の中を貼る。`{PARTNER_DOMAINS}` を、いま進めている契約の相手のドメイン（例：`example.co.jp`）に書き換える。ここはリポジトリには書かない。
+4. タスクの画面で「API で起動」をオンにし、`/fire` の URL と合鍵（トークン）を発行する。
+5. Google Apps Script に `scripts/apps-script/notify_reply.gs` と `appsscript.json` を貼り、スクリプトのプロパティに `ROUTINE_URL`（4 の URL）と `ROUTINE_TOKEN`（4 の合鍵）を貼る。`install()` を1回だけ手で実行する。
+6. タスクの画面で、毎朝1回の予備の起動を足す。
+7. 終わったら、Claude に「見張りの設定が済んだ」と伝える。Claude が下の「4. 試し方」を回す。
+
 ## 1. 道具の制限（disallowed_tools に書く）
 読むことだけをさせる。spec の試運転で、`permitted_tools` では絞れず、`allowed_tools` に無い Bash も動いたので、**止めるものを明示する**。
 

@@ -1,0 +1,7 @@
+{
+  "note": "目標の線。告知の公開の前に judge_lines.py seal で封じる（ハッシュが register.csv に刻まれる）。封じたあとは書き換えない。metric は register.csv の列（applied・attended・consented・profit）か、--results で渡す外の結果の名前",
+  "weak_ratio": 0.8,
+  "lines": [
+    {"id": "attended", "metric": "attended", "target": 0, "definition": "チェックインした人"}
+  ]
+}

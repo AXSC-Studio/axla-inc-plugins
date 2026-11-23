@@ -18,7 +18,7 @@ Versions follow [Semantic Versioning](https://semver.org/). Every version bump a
 - Small fixes from #30: `GOOGLE_ACCESS_TOKEN` instead of `T` and a timeout in `resolve_comments.py`; the changes JSON format is now named `axla-legal/changes v1` (the old name is still read); the spec's version wording follows vX.Y.Z; the entry skill says it is for Japanese .docx contracts and when not to use it.
 
 ## 0.17.0
-- Reply watcher: versioned routine settings (blocked tools, prompt that treats mail as data, spoofing rule, test with an instruction-laden dummy mail); Apps Script scopes, lock, minimal logs, beta header as a property (#28).
+- Reply watcher: versioned routine settings (blocked tools, prompt that treats mail as data, spoofing rule, setup steps, test with an instruction-laden dummy mail); Apps Script scopes, lock, minimal logs, beta header as a property (#28).
 
 ## 0.16.1
 - Added this changelog and the 1.0.0 conditions; CI now checks that a version bump has a changelog entry (#29).
@@ -90,7 +90,7 @@ Versions follow [Semantic Versioning](https://semver.org/). Every version bump a
 - #30 の小さな直し：`resolve_comments.py` のトークンを `T` から `GOOGLE_ACCESS_TOKEN` にし、待ち時間の上限を付けた。changes JSON の形式名を `axla-legal/changes v1` にした（旧名も読める）。spec の版の書き方を vX.Y.Z にそろえた。入口のスキルに、日本語の .docx 向けであることと、使わない場面を書いた。
 
 ## 0.17.0
-- 返事の見張り：止める道具・メールの本文をデータとして扱うプロンプト・なりすましの扱い・指示入りのダミーのメールでの試し方を、版付きで置いた。Apps Script は権限を絞り、二重起動を止め、ログを最小にし、beta の値をプロパティに出した（#28）。
+- 返事の見張り：止める道具・メールの本文をデータとして扱うプロンプト・なりすましの扱い・設定の手順・指示入りのダミーのメールでの試し方を、版付きで置いた。Apps Script は権限を絞り、二重起動を止め、ログを最小にし、beta の値をプロパティに出した（#28）。
 
 ## 0.16.1
 - この変更履歴と 1.0.0 の条件を足した。版を上げたら変更履歴に書いてあるかを、CI が確かめる（#29）。

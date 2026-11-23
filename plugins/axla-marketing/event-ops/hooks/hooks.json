@@ -1,0 +1,28 @@
+{
+  "description": "event-ops の実行境界・承認ゲート（PreToolUse、spec 002）と、内側のループの終了条件・予算上限（Stop、spec 003）。使う側に loop/marketing/event-ops/ が無いリポでは何もしない",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/event-ops/hooks/guard_send.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/event-ops/hooks/stop_guard.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

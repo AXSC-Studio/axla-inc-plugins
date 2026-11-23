@@ -1,0 +1,3 @@
+# names.local（git に入れない。.gitignore に足す）
+# 番号<TAB>名前<TAB>メール
+PT-001	(会場の担当者の名前)	venue@example.com
