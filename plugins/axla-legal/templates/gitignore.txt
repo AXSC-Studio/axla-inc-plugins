@@ -1,0 +1,2 @@
+# 使う側のリポジトリの .gitignore に足す1行（契約の本文と相手の名前が入るため、git に入れない）
+loop/legal/contracts/
