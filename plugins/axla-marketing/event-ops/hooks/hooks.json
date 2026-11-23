@@ -1,0 +1,17 @@
+{
+  "description": "event-ops の実行境界（Sandbox）と承認ゲート（Human Gate）。spec 002。使う側に loop/marketing/event-ops/ が無いリポでは何もしない",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/event-ops/hooks/guard_send.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

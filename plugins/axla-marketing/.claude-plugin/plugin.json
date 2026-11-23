@@ -1,7 +1,7 @@
 {
   "name": "axla-marketing",
   "displayName": "Axla Marketing",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Axla's marketing desk: each feature in its own folder. meeting-to-article turns a solo Google Meet into a draft article; event-ops (specs only) runs an in-person event you host",
   "author": {
     "name": "Axla Inc.",
@@ -15,5 +15,6 @@
   ],
   "skills": [
     "./meeting-to-article/skills"
-  ]
+  ],
+  "hooks": "./event-ops/hooks/hooks.json"
 }
