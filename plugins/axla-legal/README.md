@@ -78,6 +78,9 @@ Templates for your own repository are in `templates/` (`LEGAL.md`, `register.csv
 ## Guardrails (hooks)
 The plugin ships hooks that stop, instead of just asking: sending mail to a contract counterparty, creating a reply draft before the clean-copy check passes or with images or attachments, ending the turn before the draft check passes, editing `LEGAL.md` during a deal, and adding contract records to git. Details and a sample for your repository's settings: [docs/guardrails.md](docs/guardrails.md).
 
+## Changes and releases
+See [CHANGELOG.md](CHANGELOG.md), including the conditions for 1.0.0.
+
 ## License
 MIT
 
@@ -160,6 +163,9 @@ python3 -I "$T/make_reply.py" "$E/Redline Data.json" --out-text "$W/reply.txt" -
 
 ### 柵（Hook）
 頼むだけでなく、道具で止めます。契約の相手へのメールの送信、清書の検査が通る前や画像・添付のある返信の下書き、下書きの確認が通る前にターンを終えること、中間ループの間の `LEGAL.md` の書き換え、契約の記録の `git add` を止めます。くわしくと、利用側の設定の見本は [docs/guardrails.md](docs/guardrails.md)。
+
+### 変更履歴とリリース
+[CHANGELOG.md](CHANGELOG.md)（1.0.0 を出す条件も）。
 
 ### ライセンス
 MIT

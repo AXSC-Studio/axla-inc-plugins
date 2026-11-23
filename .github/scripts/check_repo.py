@@ -6,6 +6,7 @@
    must have a different "version". / プラグインのフォルダが変わったのに版が上がっていなければ落とす。
 2. No "version" in marketplace.json plugin entries (the version lives only in plugin.json).
    / marketplace.json のプラグインの項目に version があれば落とす。
+   If the plugin has a CHANGELOG.md, the new version must have a "## X.Y.Z" entry. / 変更履歴があるプラグインは、新しい版の見出しが要る。
 3. No contract files: *.docx, *.pdf, *.zip, "Redline Data.json" or a contracts/ folder anywhere in the repository,
    except the fictional samples under plugins/*/examples/. / 契約ファイルが混ざっていたら落とす（見本の置き場所は除く）。
 """
@@ -37,6 +38,13 @@ def main():
             old = None  # new plugin
         if old is not None and old == new:
             errors.append(f'{p}: files changed but version is still {new} (bump it in {path}) / 版が上がっていない')
+        changelog = f'plugins/{p}/CHANGELOG.md'
+        try:
+            log = git('show', f'HEAD:{changelog}')
+        except subprocess.CalledProcessError:
+            log = None  # 変更履歴をまだ持たないプラグインは見ない
+        if log is not None and old != new and not re.search(r'^## ' + re.escape(str(new)) + r'\s*$', log, re.M):
+            errors.append(f'{p}: version {new} has no "## {new}" entry in {changelog} / 変更履歴に書いていない')
 
     market = json.loads(git('show', 'HEAD:.claude-plugin/marketplace.json'))
     for e in market.get('plugins', []):
