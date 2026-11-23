@@ -4,7 +4,7 @@
 
 **実装**: リポの `.github/ISSUE_TEMPLATE/event-ops-learning.yml`
 **起源**: 001。「各社の学びが各社の中で閉じると、プラグイン本体は育たない」という反証
-**ステータス**: L1（spec 起票・Human Judge 確認待ち）
+**ステータス**: L2（Issue のテンプレートを作った。Human Judge のマージ待ち）
 
 ---
 
