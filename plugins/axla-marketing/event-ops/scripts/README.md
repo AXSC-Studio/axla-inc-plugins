@@ -22,6 +22,7 @@
 | `match_partner.py` | — | アドレスを相手の番号に手元で引き当てる（names.local は外に出さない） |
 | `count_roster.py` | 検証器（Verifier） | 名簿から申し込み・来場・同意の件数だけを台帳に入れる。`--delete` で名簿を消す |
 | `close_event.py` | 終了条件（Exit Criteria）・起動トリガー | 撤収の確認・精算・お礼の送信の3つがそろったらイベントを閉じ、外側を起こす。お礼の下書きは来場者だけ宛て |
+| `judge_lines.py` | 検証器（Verifier） | seal：目標の線のハッシュを register.csv に刻む（告知の公開の前。封じていないと hook が公開を止める）。judge：封じた線と結果を照らし、人の判断の数を前回と比べ、2回出た失敗を決まりの案にする |
 | `eventops_lib.py` | — | 上の道具が共有する部品（置き場・runs.jsonl・checklist） |
 
 ## 道具の分け方

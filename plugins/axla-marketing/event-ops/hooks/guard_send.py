@@ -176,7 +176,23 @@ def check_frozen_overwrite(base, tool_name, tool_input):
         block(base, tool_name, "frozen_overwrite", "この URL は相手に送った凍結した版です。上書きせず、新しい版を別の URL で作ってください")
 
 
+def is_publish(tool_name, tool_input):
+    vis = tool_input.get("visibility") if isinstance(tool_input, dict) else None
+    return bool(re.search(r"publish", short_name(tool_name), re.I)) or (isinstance(vis, str) and vis.lower() == "public")
+
+
+def check_lines_sealed(base, tool_name, tool_input):
+    """告知の公開は、目標の線を封じてから（spec 008）。開いているイベントのどれも封じていなければ止める。"""
+    if not is_publish(tool_name, tool_input):
+        return
+    open_states = [load_json(f) or {} for f in base.glob("events/*/state.json")]
+    open_states = [s for s in open_states if not s.get("closed")]
+    if open_states and not any(s.get("lines_sealed") for s in open_states):
+        block(base, tool_name, "lines_not_sealed", "告知の公開の前に、目標の線を封じてください（judge_lines.py seal）")
+
+
 def check_send(base, tool_name, tool_input):
+    check_lines_sealed(base, tool_name, tool_input)
     names = read_names(base)
     email_to_pid = {v: k for k, v in names.items() if v}
     texts = list(strings_in(tool_input))

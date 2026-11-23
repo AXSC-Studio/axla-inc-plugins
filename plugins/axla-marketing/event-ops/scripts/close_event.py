@@ -44,17 +44,7 @@ def teardown_boxes(event):
 
 
 def set_register(base, event_id, **kw):
-    f = base / "register.csv"
-    with open(f, encoding="utf-8") as fh:
-        reader = csv.DictReader(fh)
-        fields, rows = reader.fieldnames, list(reader)
-    for r in rows:
-        if r["id"] == event_id:
-            r.update({k: str(v) for k, v in kw.items()})
-    with open(f, "w", newline="", encoding="utf-8") as fh:
-        w = csv.DictWriter(fh, fieldnames=fields)
-        w.writeheader()
-        w.writerows(rows)
+    lib.set_register(base, event_id, **kw)
 
 
 def maybe_close(event, st):

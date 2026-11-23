@@ -2,16 +2,124 @@
   "event": "{{EVENT_ID}}",
   "note": "全項目は未達（passes: false）から始まる。達成にするのは checklist.py mark だけ（証拠のパスが要る）。kind: script はスクリプトが、review は検証役の記録（致命的: 0）が証拠",
   "items": [
-    {"id": "plan", "kind": "doc", "desc": "目的（社内向けと相手向け）・目標の線・定員・参加費・日程の候補が plan.md にある", "depends_on": [], "passes": false, "evidence": null},
-    {"id": "budget", "kind": "script", "desc": "収支を recalc_budget.py で計算した（budget.md）", "depends_on": [], "passes": false, "evidence": null},
-    {"id": "event_page", "kind": "doc", "desc": "告知の下書き（非公開）と、その文面", "depends_on": ["budget", "date"], "passes": false, "evidence": null},
-    {"id": "eyecatch", "kind": "doc", "desc": "アイキャッチの画像", "depends_on": ["date"], "passes": false, "evidence": null},
-    {"id": "overview", "kind": "doc", "desc": "概要の資料", "depends_on": ["date"], "passes": false, "evidence": null},
-    {"id": "sponsor_deck", "kind": "doc", "desc": "スポンサー向けの資料", "depends_on": ["budget"], "passes": false, "evidence": null},
-    {"id": "venue_layout", "kind": "doc", "desc": "当日の会場レイアウト（会場が決まる前は【仮】でよい）", "depends_on": ["venue"], "passes": false, "evidence": null},
-    {"id": "outbound", "kind": "script", "desc": "相手に出す中身を check_outbound.py で確かめた（exit 0）", "depends_on": ["budget", "date", "venue"], "passes": false, "evidence": null},
-    {"id": "review_money", "kind": "review", "desc": "検証役「お金」：致命的 0", "depends_on": ["budget"], "passes": false, "evidence": null},
-    {"id": "review_safety", "kind": "review", "desc": "検証役「同意と安全」：致命的 0", "depends_on": ["venue"], "passes": false, "evidence": null},
-    {"id": "review_outbound", "kind": "review", "desc": "検証役「相手に見せてよいか」：致命的 0", "depends_on": ["budget", "date", "venue"], "passes": false, "evidence": null}
+    {
+      "id": "plan",
+      "kind": "doc",
+      "desc": "目的（社内向けと相手向け）・目標の線・定員・参加費・日程の候補が plan.md にある",
+      "depends_on": [],
+      "passes": false,
+      "evidence": null
+    },
+    {
+      "id": "lines",
+      "kind": "script",
+      "desc": "目標の線を lines.json に書き、judge_lines.py seal で封じた（告知の公開の前に）",
+      "depends_on": [],
+      "passes": false,
+      "evidence": null
+    },
+    {
+      "id": "budget",
+      "kind": "script",
+      "desc": "収支を recalc_budget.py で計算した（budget.md）",
+      "depends_on": [],
+      "passes": false,
+      "evidence": null
+    },
+    {
+      "id": "event_page",
+      "kind": "doc",
+      "desc": "告知の下書き（非公開）と、その文面",
+      "depends_on": [
+        "budget",
+        "date"
+      ],
+      "passes": false,
+      "evidence": null
+    },
+    {
+      "id": "eyecatch",
+      "kind": "doc",
+      "desc": "アイキャッチの画像",
+      "depends_on": [
+        "date"
+      ],
+      "passes": false,
+      "evidence": null
+    },
+    {
+      "id": "overview",
+      "kind": "doc",
+      "desc": "概要の資料",
+      "depends_on": [
+        "date"
+      ],
+      "passes": false,
+      "evidence": null
+    },
+    {
+      "id": "sponsor_deck",
+      "kind": "doc",
+      "desc": "スポンサー向けの資料",
+      "depends_on": [
+        "budget"
+      ],
+      "passes": false,
+      "evidence": null
+    },
+    {
+      "id": "venue_layout",
+      "kind": "doc",
+      "desc": "当日の会場レイアウト（会場が決まる前は【仮】でよい）",
+      "depends_on": [
+        "venue"
+      ],
+      "passes": false,
+      "evidence": null
+    },
+    {
+      "id": "outbound",
+      "kind": "script",
+      "desc": "相手に出す中身を check_outbound.py で確かめた（exit 0）",
+      "depends_on": [
+        "budget",
+        "date",
+        "venue"
+      ],
+      "passes": false,
+      "evidence": null
+    },
+    {
+      "id": "review_money",
+      "kind": "review",
+      "desc": "検証役「お金」：致命的 0",
+      "depends_on": [
+        "budget"
+      ],
+      "passes": false,
+      "evidence": null
+    },
+    {
+      "id": "review_safety",
+      "kind": "review",
+      "desc": "検証役「同意と安全」：致命的 0",
+      "depends_on": [
+        "venue"
+      ],
+      "passes": false,
+      "evidence": null
+    },
+    {
+      "id": "review_outbound",
+      "kind": "review",
+      "desc": "検証役「相手に見せてよいか」：致命的 0",
+      "depends_on": [
+        "budget",
+        "date",
+        "venue"
+      ],
+      "passes": false,
+      "evidence": null
+    }
   ]
 }

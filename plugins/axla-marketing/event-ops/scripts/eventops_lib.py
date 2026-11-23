@@ -4,6 +4,7 @@
 - 状態ストア（State Store）：events/<ID>/checklist.json・state.json・event-log.md
 - 観測記録（Observability）：loop/marketing/event-ops/runs.jsonl に1周1行（実名なし）
 """
+import csv
 import json
 import re
 from datetime import datetime, timezone
@@ -119,3 +120,41 @@ def append_to_section(log_path, heading, line):
             p.write_text("\n".join(lines) + "\n", encoding="utf-8")
             return
     p.write_text(text.rstrip("\n") + f"\n\n## {heading}\n{line}\n", encoding="utf-8")
+
+
+# --- 台帳 register.csv（git に入る。件数とハッシュだけ） -------------------
+
+REGISTER_FIELDS = ["id", "state", "created", "capacity", "applied", "attended", "consented", "profit", "judgments", "lines_sha256"]
+
+
+def read_register(base):
+    f = Path(base) / "register.csv"
+    if not f.exists():
+        return list(REGISTER_FIELDS), []
+    with open(f, encoding="utf-8") as fh:
+        reader = csv.DictReader(fh)
+        fields = list(reader.fieldnames or REGISTER_FIELDS)
+        rows = list(reader)
+    for name in REGISTER_FIELDS:  # 古い台帳に無い列は足す
+        if name not in fields:
+            fields.append(name)
+    return fields, rows
+
+
+def write_register(base, fields, rows):
+    with open(Path(base) / "register.csv", "w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=fields)
+        w.writeheader()
+        for r in rows:
+            w.writerow({k: r.get(k, "") for k in fields})
+
+
+def set_register(base, event_id, **kw):
+    fields, rows = read_register(base)
+    row = next((r for r in rows if r.get("id") == event_id), None)
+    if row is None:
+        row = {"id": event_id}
+        rows.append(row)
+    row.update({k: str(v) for k, v in kw.items()})
+    write_register(base, fields, rows)
+    return row
