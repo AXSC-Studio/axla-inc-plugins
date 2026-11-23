@@ -9,7 +9,7 @@
 
 | ファイル | 役割 |
 |---|---|
-| `redline.py` | changes JSON の `changes` を、変更履歴として `word/document.xml` に入れる |
+| `redline.py` | changes JSON の `changes` を、変更履歴として `word/document.xml` に入れる。Google ドキュメントから書き出した雛形の空の包み（`goog_rdk`）は先に外す（文字は変えない）。新しい ID がもとの ID とぶつかるときは、書く前に止まる |
 | `add_comments.py` | changes JSON の `comments` を、Word のコメントとして入れる（本体は `comment.py`。下の「入手先」） |
 | `check_draft.py` | Gmail の下書き（送った後は送信済みのメール）を調べる。HTML の `<img>`、画像のパーツ、添付の数、修正点が make_reply.py の出力どおりかを見て、違えば止まる |
 | `intake_ppap.py` | パスワード付き zip（PPAP）で届いた契約書を展開する。パスワードは標準入力か入力欄で受け、表示も保存もしない（引数にしない）。中身が .docx 1つでなければ止まる |
