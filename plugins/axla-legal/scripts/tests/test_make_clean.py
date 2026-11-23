@@ -1,7 +1,7 @@
 """make_clean.py と accept.py のテスト（作り話の契約書で確かめる。実物の契約書は使わない）。
 
 使い方:
-    python3 -I -m unittest discover -s "${CLAUDE_PLUGIN_ROOT}/scripts/tests"
+    python3 -I -m unittest discover -s <道具のフォルダ>/tests
 """
 import os
 import subprocess

@@ -13,7 +13,8 @@ A Claude Code plugin that runs a contract you received (starting with NDAs) from
 ## How to use
 1. Install: `/plugin install axla-legal@axla-inc-plugins`
 2. In the repository where you will use it, create `loop/legal/` and put your own rules `LEGAL.md` and your ledger `register.csv` there (columns are in [docs/register.md](docs/register.md))
-3. Ask "Please review this contract". The skill `redline-contract` (`/axla-legal:redline-contract`) reads the rules ([specs](specs/legal-001-run-contract-loop.md)) and the tools ([scripts](scripts/README.md)) and proceeds
+3. Add one line to that repository's `.gitignore`: `loop/legal/contracts/` (the tools stop if it is missing)
+4. Type `/axla-legal:loop` (or ask "Please review this contract"). The entry reads where each contract stands and runs only the next step: `intake` → `redline-contract` → `review` → `gdoc` → `send` → `learn`. It stops and tells you when it is waiting for a person (final OK, sending, signing)
 
 Contract text and per-contract records never go into this plugin or into git. Sending, signing and any decision outside your rules are always done by a person.
 
@@ -38,7 +39,8 @@ MIT
 ### 使い方
 1. 入れる：`/plugin install axla-legal@axla-inc-plugins`
 2. 使う側のリポジトリに `loop/legal/` を作り、自社の決まり `LEGAL.md` と台帳 `register.csv` を置く（列は [docs/register.md](docs/register.md)）
-3. 「この契約書を見て」と頼むと、スキル `redline-contract`（`/axla-legal:redline-contract`）が決まり（[specs](specs/legal-001-run-contract-loop.md)）と道具（[scripts](scripts/README.md)）を読んで進める
+3. そのリポジトリの `.gitignore` に `loop/legal/contracts/` の1行を足す（無いと道具が止まる）
+4. `/axla-legal:loop` と打つ（または「この契約書を見て」と頼む）。入口が契約ごとにいまどこかを読み、次の1歩だけを進める：`intake` → `redline-contract` → `review` → `gdoc` → `send` → `learn`。人を待つ所（最終 OK・送信・署名）では止まって知らせる
 
 契約書の本文と契約ごとの記録は、このプラグインにも git にも入れません。送信・署名・決まりの外の判断は、必ず人が行います。
 

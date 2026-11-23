@@ -8,6 +8,10 @@ gate.json は利用側の `loop/legal/contracts/<契約 ID>/gate.json` に置く
         相手の宛先・スレッド・メッセージを登録する（入口で1回。返事が別スレッドで来たら足す）。
     python3 -I gate.py status <契約の記録フォルダ>
         ゲートの記録を表示する。
+    python3 -I gate.py mark <契約の記録フォルダ> <approval|gdoc|signed|dropped|learned> [--id <gdoc の ID>] [--note ...]
+        段階が済んだことを記録する（loop.py が次の1歩を決めるのに使う）。approval（代表の最終 OK）・signed・dropped は
+        人間ゲートなので、代表がチャットで言ったときだけ付ける。gdoc は社内 gdoc を作ったとき（--id にその ID）。
+        approval と gdoc には、そのときの Redline Data.json の時刻を一緒に残す（あとで直しが変われば、やり直しになる）。
 
 道具が書く項目:
     clean  … make_clean.py --record が書く（清書の検査に通った・清書の sha256・時刻）
@@ -120,7 +124,26 @@ def main():
     w.add_argument('--message', action='append', default=[])
     s = sub.add_parser('status')
     s.add_argument('cdir')
+    mk = sub.add_parser('mark')
+    mk.add_argument('cdir')
+    mk.add_argument('what', choices=['approval', 'gdoc', 'signed', 'dropped', 'learned'])
+    mk.add_argument('--id')
+    mk.add_argument('--note')
     args = ap.parse_args()
+    if args.cmd == 'mark':
+        rec = {'at': now()}
+        redline = os.path.join(args.cdir, 'Redline Data.json')
+        if os.path.exists(redline):
+            rec['redline_mtime'] = os.path.getmtime(redline)
+        if args.id:
+            rec['id'] = args.id
+        if args.note:
+            rec['note'] = args.note
+        if args.what == 'gdoc' and not args.id:
+            sys.exit('gdoc には --id（作った gdoc の ID）が要る')
+        update(args.cdir, args.what, rec)
+        print(f'ok: {args.what} を記録した')
+        return
     if args.cmd == 'watch':
         g = load(args.cdir)
         watch = g.setdefault('watch', {'to': [], 'threads': [], 'messages': []})

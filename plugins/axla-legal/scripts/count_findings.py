@@ -1,7 +1,10 @@
 """検証役の出力から、重さごとの指摘の数を道具で数え直し、合否を出す（検証役の言葉だけに頼らない）。
 
 使い方:
-    python3 -I count_findings.py <検証役の出力のファイル> [...]
+    python3 -I count_findings.py <検証役の出力のファイル> [...] [--record <契約の記録フォルダ>]
+
+--record を渡すと、合否を gate.json の review に書く（そのときの Redline Data.json の時刻と一緒に）。
+loop.py は、これを見て次の1歩を決める。
 
 - 指示文（prompts/reviewer-prompts.md 2.0.0 以降）は、指摘の行を【致命的】【重要】【軽微】で始める決まり。
   この印の数を数える。
@@ -41,7 +44,7 @@ def count(text):
     return got, said, fixed, raised
 
 
-def main(paths):
+def main(paths, last=None):
     worst = 0
     total = {k: 0 for k in LEVELS}
     for p in paths:
@@ -63,6 +66,8 @@ def main(paths):
         if fixed['致命的']:
             worst = max(worst, 1)
     print('合計：' + '・'.join(f'{k} {total[k]}件' for k in LEVELS))
+    if last is not None:
+        last['critical'] = total['致命的']
     if worst == 2:
         print('判定：数え直しが合わない → その検証役をもう一度回す')
     elif total['致命的']:
@@ -72,7 +77,30 @@ def main(paths):
     return worst
 
 
+def record(cdir, worst, critical):
+    import os
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import gate
+    rec = {'ok': worst == 0, 'critical': critical, 'recount_mismatch': worst == 2, 'at': gate.now()}
+    redline = os.path.join(cdir, 'Redline Data.json')
+    if os.path.exists(redline):
+        rec['redline_mtime'] = os.path.getmtime(redline)
+    gate.update(cdir, 'review', rec)
+
+
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
+    argv = sys.argv[1:]
+    cdir = None
+    if '--record' in argv:
+        k = argv.index('--record')
+        if k + 1 >= len(argv):
+            sys.exit('--record には契約の記録フォルダを渡す')
+        cdir = argv[k + 1]
+        argv = argv[:k] + argv[k + 2:]
+    if not argv:
         sys.exit(__doc__)
-    sys.exit(main(sys.argv[1:]))
+    LAST = {}
+    worst = main(argv, LAST)
+    if cdir:
+        record(cdir, worst, LAST.get('critical', 0))
+    sys.exit(worst)

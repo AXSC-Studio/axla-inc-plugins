@@ -1,7 +1,7 @@
 """hooks/guard.py（柵）のテスト。作り話の契約と宛先（example.test）で、止まる例と通る例を確かめる。
 
 使い方:
-    python3 -I -m unittest discover -s "${CLAUDE_PLUGIN_ROOT}/scripts/tests"
+    python3 -I -m unittest discover -s <道具のフォルダ>/tests
 """
 import json
 import os

@@ -25,7 +25,7 @@
 契約ごとの記録フォルダ `loop/legal/contracts/<契約 ID>/gate.json` に置きます。git には入れません。使う側のリポジトリの .gitignore に `loop/legal/contracts/` が要ります（無ければ道具が書く前に止まります）。相手のメールアドレスが入るので、プラグインの中にも git にも置きません。
 
 ```bash
-T="${CLAUDE_PLUGIN_ROOT}/scripts"
+T=<道具のフォルダの絶対パス>   # SKILL.md に出ているもの（Bash では ${CLAUDE_PLUGIN_ROOT} が置き換わらない）
 C=loop/legal/contracts/<契約 ID>
 # 入口で1回：相手の宛先と、届いたメールのスレッド・メッセージを登録する（返事が別スレッドで来たら足す）
 python3 -I $T/gate.py watch $C --to <相手のアドレス> --thread <threadId> --message <messageId>
@@ -63,5 +63,5 @@ Hook に加えて、利用側のリポジトリの `.claude/settings.json` で�
 ## 試し方
 
 ```bash
-python3 -I -m unittest discover -s "${CLAUDE_PLUGIN_ROOT}/scripts/tests"
+python3 -I -m unittest discover -s "$T/tests"
 ```

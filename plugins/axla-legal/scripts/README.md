@@ -17,7 +17,7 @@
 | `accept.py` | 変更履歴をすべて承諾した版にする（本文・ヘッダー・フッター・脚注。移動と書式の変更履歴も）。全部を作り直せてから書く |
 | `view.py` | 本文を段落ごとに表示する（`redline`／`changed`／`accept`） |
 | `make_reply.py` | 相手への返信メールの本文（プレーンテキストと HTML）を、changes JSON から作る。修正点の理由は、契約書の相手向けコメントの文をそのまま使う。**メール本文の修正点は、この道具で作る。手で書かない** |
-| `resolve_comments.py` | gdoc の開いているコメントを「解決済み」にする（消さない）。.docx を gdoc に取り込み直す前に使う |
+| `resolve_comments.py` | gdoc の開いているコメントを「解決済み」にする（消さない）。標準の流れでは使わない（gdoc は最後に1回だけ作るため）。前からある gdoc を直すときだけ |
 | `make_loop_log.py` | Loop Log を gdoc にしていたときの道具（JSON から HTML を作る）。いまの Loop Log は `loop/legal/contracts/<契約 ID>/loop-log.md` に直接書くので、付録（境目の版と最新の直しの違う段落）を作りたいときだけ使う |
 | `gate.py` | 契約ごとのゲートの記録（`$C/gate.json`）を読み書きする。入口で相手の宛先・スレッド・メッセージを登録する（`watch`）。Hook（`hooks/guard.py`）はこの記録で、送信・下書き・LEGAL.md の書き換えなどを止める（[docs/guardrails.md](../docs/guardrails.md)） |
 | `budget.py` | 予算（回数・日数・トークン・時間の上限）。上限は利用側の `loop/legal/budget.json`（無ければ「上限なし」）。`cycle` で内側のループの周回を数え、`check` が予算切れなら終了コード 3 で止まる |
@@ -25,13 +25,19 @@
 | `count_findings.py` | 検証役の出力から【致命的】【重要】【軽微】の数を数え直し、合否を出す（致命的があれば終了コード 1、件数が合わなければ 2） |
 | `outer_loop.py` | 外側のループ：Loop Log の「学び」を集める（`collect`）、LEGAL.md の世代を上げる（`bump`。`legal-outer/` のブランチだけ） |
 | `tests/` | 作り話の契約書で、道具と柵が止める例と通る例を確かめるテスト |
+| `loop.py` | 入口の道具。契約の記録（gate.json・Redline Data.json）から、いまどの段階かを読み、次の1歩（どの部品か、人を待つか）を決める。`next <記録フォルダ>`・`list` |
 | `apps-script/notify_reply.gs` | 入口の自動検知（試運転）。Gmail のラベル「Legal/返信あり」のスレッドを1分ごとに見つけ、クラウドの見張りタスクを起こす（本文はスレッド ID だけ）。くわしくは specs/legal-001 の「入口の自動検知（試運転）」 |
 
 ## 準備
 
+ふだんは `/axla-legal:loop` を使う。入口の道具（`loop.py`）が次の1歩を決め、部品のスキルがこの手順の該当の所だけを使う。この節から下は、その中身と、手で動かすときのための説明。
+
+**道具のフォルダ `T`**：`${CLAUDE_PLUGIN_ROOT}` は、スキルの中では置き換わるが、Claude が Bash で動かすコマンドの中では**置き換わらない**（Issue #26）。スキル（SKILL.md）に表示された道具のフォルダの絶対パスを `T` に入れる。人が手で動かすときは、`/plugin` の画面でプラグインの場所を見る。
+
 ```bash
+T=<道具のフォルダの絶対パス>        # 例：SKILL.md に出ている …/axla-legal/<版>/scripts
 python3.13 -m venv <作業フォルダ>/venv
-<作業フォルダ>/venv/bin/pip install -r "${CLAUDE_PLUGIN_ROOT}/scripts/requirements.txt"
+<作業フォルダ>/venv/bin/pip install -r "$T/requirements.txt"
 ```
 
 - 契約ごとの記録（changes JSON の `Redline Data.json`、`loop-log.md`）は、axla-inc の `loop/legal/contracts/<契約 ID>/` に置く（git に入れない。使う側のリポジトリの .gitignore に `loop/legal/contracts/` の1行が要る。無ければ gate.py を使う道具が書く前に止まる）。下の `C` がこのフォルダ。
@@ -49,10 +55,10 @@ python3.13 -m venv <作業フォルダ>/venv
 
 ## 実行の順番
 
-標準の流れ（specs/legal-001 の「標準の流れ」）：まず社内用の gdoc だけを更新して検証し、代表の「最終 OK」を待つ。清書（手順 9 の make_clean.py）・PDF の目視（最終 OK のあとに1回だけ）・返信の下書き（手順 10〜11）は、最終 OK のあとで行う。
+標準の流れ（specs/legal-001 の「標準の流れ」）：内側のループは手元の .docx で回し、通ったら社内用の gdoc を1回だけ作って、代表の「最終 OK」を待つ。清書（手順 9 の make_clean.py）・PDF の目視（最終 OK のあとに1回だけ）・返信の下書き（手順 10〜11）は、最終 OK のあとで行う。
 
 ```bash
-T="${CLAUDE_PLUGIN_ROOT}/scripts"   # このフォルダ（プラグインの中）。作業は利用側のリポジトリで行う
+T=<道具のフォルダの絶対パス>       # 上の「準備」。作業は利用側のリポジトリで行う
 W=<作業フォルダ>                 # 使い捨て（展開・作った .docx）
 C=loop/legal/contracts/<契約 ID>      # 記録（Redline Data.json・loop-log.md）。git に入れない
 SK=<docx スキルの scripts フォルダ>
@@ -87,18 +93,14 @@ python3 -I $T/budget.py cycle $C --version vX.Y.Z && python3 -I $T/budget.py che
 python3 -I $T/view.py $W/work changed
 python3 -I $T/view.py $W/work accept > $W/accepted.txt   # 最後に検証した直しの本文と突き合わせる
 
-# 7. Drive の社内用の gdoc（<契約フォルダ名>_vX.Y.Z_Axla Comments）に、同じ ID のまま取り込む（新しいファイルは作らない）
-#    v4 以降は、前に送った版の gdoc を vN の名前でコピーしてから取り込む（specs/legal-001 の「版の決まり」）
-T_=$(gcloud auth print-access-token)   # トークンは表示しない・保存しない
-#    取り込み直す前に、gdoc の開いているコメントを解決済みにする（消さない）。
-#    Drive のコメントは取り込み直しても消えないので、こうしないと前のコメントと新しいコメントが二重になる
-T=$T_ python3 -I $T/resolve_comments.py <その版の gdoc の ID>
-curl -s -X PATCH -H "Authorization: Bearer $T_" \
-  -H "Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document" \
-  --data-binary @$W/redline.docx \
-  "https://www.googleapis.com/upload/drive/v3/files/<その版の gdoc の ID>?uploadType=media"
+# 7. 内側のループが通ったら、社内用の gdoc を1回だけ作る（Issue #33。gcloud は使わない）。
+#    Google ドライブのつながりの create_file で、$W/redline.docx を Drive の契約フォルダに Google ドキュメントとして作る。
+#    名前は <契約フォルダ名>_vX.Y.Z_Axla Comments。前に作った同じ版の gdoc があれば、ゴミ箱に移す（リンクは変わる）。
+python3 -I $T/gate.py mark $C gdoc --id <作った gdoc の ID>
 
-# 8. Docs API で読み、提案（suggestedInsertionIds／suggestedDeletionIds）と、開いているコメントの数が changes JSON の comments の数と同じことを確かめる
+# 8. gdoc を開き、提案と開いているコメントの数が changes JSON の comments の数と同じことを確かめる。
+#    代表に gdoc のリンクと「何を変えたか」を3行で知らせて止まる。代表が「最終 OK」と言ったら：
+python3 -I $T/gate.py mark $C approval
 
 # 9. specs/legal-001 の「送る前のゲート」を通す（文書のプロパティ・社内向けの混入・承諾後の本文・添付名）。
 #    相手に送るのは清書。redline.docx（履歴付き）は社内用の gdoc に取り込むだけにする

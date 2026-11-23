@@ -1,22 +1,20 @@
 ---
 name: redline-contract
-description: Use when a contract (starting with an NDA) arrives and needs a redline with tracked changes and comments, a reply email, or a ledger update, and when running the back-and-forth until signature. 日本語：相手から届いた契約書（まず NDA）を、変更履歴とコメントで直し、相手との往復を署名まで回すときに使う。契約書の受け取り・修正案づくり・返信メールの本文づくり・台帳の更新を頼まれたとき。
+description: Part of Axla Legal, normally called from /axla-legal:loop. Writes your proposed changes into the other party's contract as tracked changes, with a comment giving the reason for each change, following LEGAL.md. 日本語：Axla Legal の部品（ふだんは /axla-legal:loop から呼ばれる）。LEGAL.md に沿って、相手の契約書に修正案を変更履歴で入れ、修正ごとの理由をコメントで付ける。
 ---
 
-# redline-contract（Axla Legal）
+# redline-contract（直す）
 
-契約書を「受け取り → 自社の直し → 相手との往復 → 署名」まで回す。
+契約の仕事を最初から頼まれたときは、/axla-legal:loop から始める（いまどこかを道具が決める）。
 
-## 最初に読むもの
-1. 決まり：`${CLAUDE_PLUGIN_ROOT}/specs/legal-001-run-contract-loop.md`
-2. 道具の使い方：`${CLAUDE_PLUGIN_ROOT}/scripts/README.md`
-3. 検証役の指示文：`${CLAUDE_PLUGIN_ROOT}/prompts/reviewer-prompts.md`
-4. 利用側のデータ（いま開いているリポジトリの中）：`loop/legal/LEGAL.md`（全文を読む。書き換えない）と `loop/legal/register.csv`
+道具：`${CLAUDE_PLUGIN_ROOT}/scripts`（Bash ではこの絶対パスを使う。`${CLAUDE_PLUGIN_ROOT}` は Bash の中では置き換わらない）。手順の細部は [scripts/README.md](${CLAUDE_PLUGIN_ROOT}/scripts/README.md) の手順 1〜6。
+
+1. `loop/legal/LEGAL.md` を全文読む（書き換えない）。
+2. 原本を作業フォルダに展開し、段落の ID を調べて、`<記録フォルダ>/Redline Data.json` に直しとコメントを書く（1往復で締結できる量に絞る）。
+3. `redline.py` で変更履歴を入れる（Google ドキュメント製の雛形の包みは道具が外す）。`add_comments.py` で理由のコメントを入れる。
+4. 形式を検査する（docx スキルの validate.py）。
+5. /axla-legal:loop に戻る（次は review）。
 
 ## 守ること
 - 契約ごとの記録は `loop/legal/contracts/<契約 ID>/` に置き、git に入れない。使う側のリポジトリの .gitignore に `loop/legal/contracts/` が無ければ、道具（gate.py）が止まる。足してよいかを人に聞く。
-- 契約書の実物は、利用側が決めた保管場所（Axla は Google ドライブの契約フォルダ）に置く。
-- 送信・署名・LEGAL.md の外の判断は、人に上げる（spec の G1／送信／G2）。
-- 利用側に `loop/legal/` が無いときは、作業を止めて、置き場所を人に聞く。
-- 入口で `gate.py watch` に相手を登録する。清書は `make_clean.py --record`、下書きの確認は `check_draft.py --record` で行う。
-- 柵（`${CLAUDE_PLUGIN_ROOT}/docs/guardrails.md`）が止めたら、回り道をせず、止めた理由を直す。直せないときは人に上げる。
+- LEGAL.md の外の判断は G1 として人に上げる。
