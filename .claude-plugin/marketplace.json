@@ -14,17 +14,12 @@
     {
       "name": "axla-legal",
       "source": "./plugins/axla-legal",
-      "description": "Redline a contract you received with tracked changes and comments, then run the back-and-forth until signature",
       "category": "back-office",
       "keywords": [
         "legal",
         "contract",
         "back-office"
-      ],
-      "author": {
-        "name": "Axla Inc.",
-        "url": "https://github.com/AXSC-Studio"
-      }
+      ]
     },
     {
       "name": "axla-marketing",

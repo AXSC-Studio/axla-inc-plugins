@@ -13,3 +13,4 @@ description: Part of Axla Legal, normally called from /axla-legal:loop. After th
 4. 検査：`get_draft` を `messageFormat=RAW` で読む。Hook がその場で検査して記録する。NG なら直す（引用の画像は、代表に Gmail の画面で消してもらう）。
 5. 代表に「下書きができた。清書を添付して送ってほしい」と知らせて止まる（人間ゲート「送信」）。
 6. 代表が送ったと言ったら、送信済みのメールを `get_message`（RAW）で読む。Hook が送った後の検査をする。台帳を「相手の返事待ち」にする。
+7. 作業フォルダ（展開した本文・清書・返信文）を消す（`rm -rf <W>`）。本文を手元に残さない。記録フォルダは消さない。

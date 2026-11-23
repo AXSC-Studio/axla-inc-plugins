@@ -1,11 +1,26 @@
 {
   "name": "axla-legal",
   "displayName": "Axla Legal",
-  "version": "0.13.0",
-  "description": "Axla's legal desk: redline a contract you received with tracked changes and comments, and run it to signature",
+  "version": "0.14.0",
+  "description": "Axla's legal desk for Japanese-language contracts (.docx) and Japanese business practice: redline the other party's contract with tracked changes and comments, check it with reviewers and tools, and run the back-and-forth to signature. Unlike a general legal-review plugin, it edits the .docx itself and keeps the pre-send checks as hooks.",
   "author": {
     "name": "Axla Inc.",
     "url": "https://github.com/AXSC-Studio"
   },
-  "license": "MIT"
+  "homepage": "https://github.com/AXSC-Studio/axla-inc-plugins/tree/main/plugins/axla-legal",
+  "repository": "https://github.com/AXSC-Studio/axla-inc-plugins",
+  "documentationUrl": "https://github.com/AXSC-Studio/axla-inc-plugins/blob/main/plugins/axla-legal/README.md",
+  "supportUrl": "https://github.com/AXSC-Studio/axla-inc-plugins/issues",
+  "privacyPolicyUrl": "https://github.com/AXSC-Studio/axla-inc-plugins/blob/main/plugins/axla-legal/PRIVACY.md",
+  "license": "MIT",
+  "keywords": [
+    "axla",
+    "legal",
+    "contract",
+    "nda",
+    "redline",
+    "docx",
+    "tracked-changes",
+    "japanese"
+  ]
 }
