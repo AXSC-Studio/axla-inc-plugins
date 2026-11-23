@@ -1,7 +1,7 @@
 """相手に送る「清書」の .docx を作る。変更履歴とコメントを入れた展開済み .docx から、清書を1つのファイルにする。
 
 使い方:
-    python3 -I make_clean.py <unpacked_dir> --out <clean.docx> [--date 2026-01-01T00:00:00Z]
+    python3 -I make_clean.py <unpacked_dir> --out <clean.docx> [--date 2026-01-01T00:00:00Z] [--record <契約の記録フォルダ>]
 
 すること:
 1. 展開済みのフォルダを作業用の一時フォルダに写す（元のフォルダは書き換えない）。
@@ -11,8 +11,11 @@
    app.xml の会社・管理者、custom.xml の独自のプロパティ）。core.xml の更新日時は --date にする。
 5. 清書になっているかを自分で確かめる（変更履歴 0・コメントの印と部品 0・隠し文字 0・作成者などの情報が空）。
 6. 通ったときだけ、--out に .docx を書く（同じ入力と --date なら、バイト単位で同じファイルになる）。
+7. --record を渡すと、契約の gate.json の clean に「通った・清書の sha256・時刻」を書く。
+   Hook は、この記録が無いと、その契約の返信の下書きを作らせない。
 
 1つでも通らなければ、終了コード 1 で止まり、--out のファイルは残さない（前からあったものも消す）。
+--record を渡したときは、gate.json の clean も「通っていない」に書き換える。
 相手に送るのは清書だけ。変更履歴とコメント入りの版は、社内用の gdoc（F_vX.Y.Z_Axla Comments）に残す。
 何を直したか・理由は、make_reply.py が作るメール本文の一覧で伝える。
 """
@@ -130,11 +133,16 @@ def main():
     ap.add_argument('unpacked', help='変更履歴とコメントを入れた展開済みの .docx のフォルダ（書き換えない）')
     ap.add_argument('--out', required=True, help='清書の .docx を書く場所')
     ap.add_argument('--date', help='core.xml の更新日時（UTC）。省くと元のまま')
+    ap.add_argument('--record', help='契約の記録フォルダ（loop/legal/contracts/<契約 ID>）。gate.json に結果を書く')
     args = ap.parse_args()
     out = os.path.abspath(args.out)
     if os.path.exists(out):
         os.remove(out)  # 前の清書が残っていると、失敗に気づかず送ってしまうため
     here = os.path.dirname(os.path.abspath(__file__))
+    sys.path.insert(0, here)
+    import gate
+    if args.record:
+        gate.update(args.record, 'clean', {'ok': False, 'at': gate.now()})
     tmp = tempfile.mkdtemp(prefix='make_clean_')
     part = out + '.part'
     try:
@@ -153,6 +161,8 @@ def main():
         shutil.rmtree(tmp, ignore_errors=True)
         if os.path.exists(part):
             os.remove(part)
+    if args.record:
+        gate.update(args.record, 'clean', {'ok': True, 'sha256': gate.sha256(out), 'file': os.path.basename(out), 'at': gate.now()})
     print(f'ok: 変更履歴 0・コメント 0・隠し文字 0・作成者などの情報を消した → {out}')
 
 

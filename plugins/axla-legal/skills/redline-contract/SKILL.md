@@ -18,3 +18,5 @@ description: Use when a contract (starting with an NDA) arrives and needs a redl
 - 契約書の実物は、利用側が決めた保管場所（Axla は Google ドライブの契約フォルダ）に置く。
 - 送信・署名・LEGAL.md の外の判断は、人に上げる（spec の G1／送信／G2）。
 - 利用側に `loop/legal/` が無いときは、作業を止めて、置き場所を人に聞く。
+- 入口で `gate.py watch` に相手を登録する。清書は `make_clean.py --record`、下書きの確認は `check_draft.py --record` で行う。
+- 柵（`${CLAUDE_PLUGIN_ROOT}/docs/guardrails.md`）が止めたら、回り道をせず、止めた理由を直す。直せないときは人に上げる。

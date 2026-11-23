@@ -1,0 +1,117 @@
+"""契約ごとの「ゲートの記録」（gate.json）を読み書きする。Hook（hooks/guard.py）と道具が使う。
+
+gate.json は利用側の `loop/legal/contracts/<契約 ID>/gate.json` に置く（契約の記録と同じ所。git に入れない）。
+相手のメールアドレスが入るので、プラグインのフォルダにも git にも置かない。
+
+使い方:
+    python3 -I gate.py watch <契約の記録フォルダ> --to <相手のアドレス> [--to ...] [--thread <threadId>] [--message <messageId>]
+        相手の宛先・スレッド・メッセージを登録する（入口で1回。返事が別スレッドで来たら足す）。
+    python3 -I gate.py status <契約の記録フォルダ>
+        ゲートの記録を表示する。
+
+道具が書く項目:
+    clean  … make_clean.py --record が書く（清書の検査に通った・清書の sha256・時刻）
+    draft  … Hook が下書きを作った／変えたときに pending にし、check_draft.py --record が通ったら checked にする
+"""
+import argparse
+import datetime
+import hashlib
+import json
+import os
+import sys
+
+NAME = 'gate.json'
+
+
+def now():
+    return datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+
+def load(cdir):
+    p = os.path.join(cdir, NAME)
+    if not os.path.exists(p):
+        return {}
+    with open(p, encoding='utf-8') as f:
+        return json.load(f)
+
+
+def save(cdir, g):
+    os.makedirs(cdir, exist_ok=True)
+    p = os.path.join(cdir, NAME)
+    tmp = p + '.tmp'
+    with open(tmp, 'w', encoding='utf-8') as f:
+        json.dump(g, f, ensure_ascii=False, indent=2)
+        f.write('\n')
+    os.replace(tmp, p)
+
+
+def update(cdir, key, value):
+    g = load(cdir)
+    g[key] = value
+    save(cdir, g)
+    return g
+
+
+def sha256(path):
+    h = hashlib.sha256()
+    with open(path, 'rb') as f:
+        for chunk in iter(lambda: f.read(1 << 16), b''):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def find_root(start):
+    """start から上にたどって、`loop/legal/` のあるフォルダ（利用側のリポジトリ）を返す。無ければ None。"""
+    d = os.path.abspath(start)
+    if os.path.isfile(d):
+        d = os.path.dirname(d)
+    while True:
+        if os.path.isdir(os.path.join(d, 'loop', 'legal')):
+            return d
+        up = os.path.dirname(d)
+        if up == d:
+            return None
+        d = up
+
+
+def contracts(root):
+    """(契約 ID, 記録フォルダ, gate.json の中身) を、gate.json のある契約だけ返す。"""
+    base = os.path.join(root, 'loop', 'legal', 'contracts')
+    out = []
+    if not os.path.isdir(base):
+        return out
+    for cid in sorted(os.listdir(base)):
+        cdir = os.path.join(base, cid)
+        if os.path.isfile(os.path.join(cdir, NAME)):
+            try:
+                out.append((cid, cdir, load(cdir)))
+            except (OSError, ValueError):
+                out.append((cid, cdir, {'broken': True}))
+    return out
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    sub = ap.add_subparsers(dest='cmd', required=True)
+    w = sub.add_parser('watch')
+    w.add_argument('cdir')
+    w.add_argument('--to', action='append', default=[])
+    w.add_argument('--thread', action='append', default=[])
+    w.add_argument('--message', action='append', default=[])
+    s = sub.add_parser('status')
+    s.add_argument('cdir')
+    args = ap.parse_args()
+    if args.cmd == 'watch':
+        g = load(args.cdir)
+        watch = g.setdefault('watch', {'to': [], 'threads': [], 'messages': []})
+        for key, vals in [('to', [v.lower() for v in args.to]), ('threads', args.thread), ('messages', args.message)]:
+            watch[key] = sorted(set(watch.get(key, [])) | set(vals))
+        save(args.cdir, g)
+        print(f'ok: 宛先 {len(watch["to"])}・スレッド {len(watch["threads"])}・メッセージ {len(watch["messages"])} を見張る')
+    else:
+        json.dump(load(args.cdir), sys.stdout, ensure_ascii=False, indent=2)
+        print()
+
+
+if __name__ == '__main__':
+    main()
