@@ -24,11 +24,12 @@ description: Use to handle the back-and-forth with the people who make an event 
 6. 承認のあと、メールの下書き（同じスレッドへの返信）を作る。送るのは人。送ったら `update_partners.py sent --partner PT-002 --event $E`（gmail の見張りがあれば自動）
 
 ## B. 返事が来た
-1. 返事を読み、**答える点・確かめる点・計画に効く点**に分ける。返事が別のスレッドで来ることがあるので、相手のドメインと日時でも探す
-2. `update_partners.py replied --partner PT-002 --event $E`（電話や対面で決まったことは `offline --note`）
-3. 計画に効く点（料金・時間・人数・日程）があれば：`budget.json`・`event.json` を直し `recalc_budget.py --event $E`。`update_partners.py stale --event $E` で、まだ送っていない下書きに【古い】が付く（【古い】のままでは check_outbound が通さない）。plan-event で内側を回し直す
-4. 返事の下書きを作り、A の 4〜6 と同じ道で送る
-5. 会場が決まったら `update_partners.py confirmed --partner PT-001 --event $E`（G2 の記録。会場の申し込み・支払いは人）
+1. 見張りの知らせ（`kind=reply|sent thread_id=…`）から始めたときは、スレッドの差出人・宛先を `python3 "$S/match_partner.py" --names loop/marketing/event-ops/names.local --email <アドレス>` で相手の番号に直す（一致しなければ人に聞く）。`kind=sent` なら `update_partners.py sent` だけして終える
+2. 返事を読み、**答える点・確かめる点・計画に効く点**に分ける。返事が別のスレッドで来ることがあるので、相手のドメインと日時でも探す
+3. `update_partners.py replied --partner PT-002 --event $E`（電話や対面で決まったことは `offline --note`）
+4. 計画に効く点（料金・時間・人数・日程）があれば：`budget.json`・`event.json` を直し `recalc_budget.py --event $E`。`update_partners.py stale --event $E` で、まだ送っていない下書きに【古い】が付く（【古い】のままでは check_outbound が通さない）。plan-event で内側を回し直す
+5. 返事の下書きを作り、A の 4〜6 と同じ道で送る
+6. 会場が決まったら `update_partners.py confirmed --partner PT-001 --event $E`（G2 の記録。会場の申し込み・支払いは人）
 
 ## C. 毎朝
 `python3 "$S/update_partners.py" overdue --days <config の reply_wait_days> --event $E` が exit 1 なら、返事待ちの相手を人に知らせる（催促の下書きまで）。

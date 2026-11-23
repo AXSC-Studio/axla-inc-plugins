@@ -100,6 +100,11 @@ class CheckNeutralTest(unittest.TestCase):
         code, out = run("check_neutral.py", str(self.d))
         self.assertEqual(code, 0, out)
 
+    def test_reserved_example_domains_pass(self):
+        (self.d / "spec.md").write_text("見本：venue@partner.example と a@b.test", encoding="utf-8")
+        code, out = run("check_neutral.py", str(self.d))
+        self.assertEqual(code, 0, out)
+
     def test_company_and_person_fail(self):
         for text in ["株式" + "会社サンプル商事", "連絡先 someone@" + "realcorp.co.jp", "電話 03-" + "1234-5678"]:
             (self.d / "spec.md").write_text(text, encoding="utf-8")
