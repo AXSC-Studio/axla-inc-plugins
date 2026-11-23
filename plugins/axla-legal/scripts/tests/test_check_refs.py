@@ -95,6 +95,15 @@ class TestSeverityRaised(unittest.TestCase):
         self.assertEqual(r.returncode, 1, r.stdout)
         self.assertIn('致命的として数える', r.stdout)
 
+    def test_wrong_target_wording_counts_as_critical(self):
+        p_ = self.write('- 【重要】第4条：「前条」が第2条第6項を指していない（指す先が違う）。直し方：…\n\n致命的 0件・重要 1件・軽微 0件\n')
+        self.assertEqual(run('count_findings.py', p_).returncode, 1)
+
+    def test_negative_word_alone_is_not_a_reference_error(self):
+        # 「使わない」の「ない」や、条番号を書いただけの指摘は、参照の誤りとして数えない
+        p_ = self.write('- 【重要】第3条第3項：学習に使わない設定をだれが確かめるかがあいまい。直し方：…\n\n致命的 0件・重要 1件・軽微 0件\n')
+        self.assertEqual(run('count_findings.py', p_).returncode, 0)
+
     def test_ordinary_important_stays_important(self):
         p_ = self.write('- 【重要】第3条：期間があいまい。直し方：…\n\n致命的 0件・重要 1件・軽微 0件\n')
         self.assertEqual(run('count_findings.py', p_).returncode, 0)
