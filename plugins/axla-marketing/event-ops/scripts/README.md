@@ -1,4 +1,4 @@
-# event-ops の道具（spec 002：実行境界と承認ゲート）
+# event-ops の道具（spec 002：実行境界と承認ゲート／spec 003：内側のループ）
 
 送信・公開・支払いを「お願い」ではなく、道具で止めるための部品です。外部のライブラリは使いません（Python 3 の標準だけ）。
 
@@ -9,6 +9,12 @@
 | `check_outbound.py` | 検証器（Verifier） | 相手に出す中身に、社内の印・送り先ではない相手の名前やメールが無いかを見る。`names.local` が無ければ止まる（exit 2） |
 | `check_pii.py` | 実行境界（Sandbox） | 使う側の git に、メール・電話番号・実名を入れないための検査。コミット前に動かす |
 | `check_neutral.py` | 検証器（Verifier） | 公開リポの `event-ops/` に、特定の会社・人の情報が無いかを見る（CI） |
+| `new_event.py` | 起動トリガー（Trigger） | イベントのフォルダをひな形から作る（init）。途中のイベントを取り込む（adopt）。checklist は必ず未達から |
+| `recalc_budget.py` | 検証器（Verifier） | 収支を計算し直す。前回から変わったら「計画の変更」に1行書き、収支に関わる項目を未達に戻す |
+| `checklist.py` | 状態ストア（State Store） | 内側の台帳。証拠の無い項目・致命的が残る検証役の項目は達成にできない。検証役はスクリプトの後 |
+| `check_kit.py` | 検証器（Verifier） | 全項目が証拠つきで達成なら exit 0。会場の確定（G2）のあとに【仮】が残れば exit 1 |
+| `../hooks/stop_guard.py` | 終了条件（Exit Criteria）・予算上限（Budget Cap） | Stop hook。内側のループの途中は終わらせない。上限の周で G1 に上げて止める |
+| `eventops_lib.py` | — | 上の道具が共有する部品（置き場・runs.jsonl・checklist） |
 
 ## 道具の分け方
 

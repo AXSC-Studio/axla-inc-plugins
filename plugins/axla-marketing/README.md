@@ -7,7 +7,7 @@ Axla's marketing desk as a Claude Code plugin. Install it once and you get every
 | Feature | Skills | What it does | Status |
 |---|---|---|---|
 | [meeting-to-article](meeting-to-article/) | `/axla-marketing:meeting-to-article` | Turns the notes of a solo Google Meet into a draft article and an eye-catch image | Working |
-| [event-ops](event-ops/) | `/axla-marketing:plan-event` and three more | Runs an in-person event you host: launch, back-and-forth with venue and sponsors, the day, follow-up, and learning for the next one | Specs + guard rails (spec 002) |
+| [event-ops](event-ops/) | `/axla-marketing:plan-event` and three more | Runs an in-person event you host: launch, back-and-forth with venue and sponsors, the day, follow-up, and learning for the next one | plan-event + guard rails (specs 002–003) |
 
 ```
 axla-marketing/
@@ -37,7 +37,7 @@ Axla のマーケティング部署を、Claude Code のプラグインにした
 | 機能 | スキル | 何をするか | 状態 |
 |---|---|---|---|
 | [meeting-to-article](meeting-to-article/) | `/axla-marketing:meeting-to-article` | 一人で話した Google Meet のメモを、記事の下書きとアイキャッチにする | 使える |
-| [event-ops](event-ops/) | `/axla-marketing:plan-event` ほか3つ | 自分で会場を借りて開くイベントを、立ち上げ・会場やスポンサーとのやりとり・当日・お礼・次回への学びまで回す | spec と柵（spec 002） |
+| [event-ops](event-ops/) | `/axla-marketing:plan-event` ほか3つ | 自分で会場を借りて開くイベントを、立ち上げ・会場やスポンサーとのやりとり・当日・お礼・次回への学びまで回す | plan-event と柵（spec 002〜003） |
 
 ### 入れ方
 ```

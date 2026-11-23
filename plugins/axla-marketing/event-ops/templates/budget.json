@@ -1,0 +1,11 @@
+{
+  "venue": {"hourly": 0, "hours": 3},
+  "fee": 0,
+  "fee_rate": 0.10,
+  "per_person_cost": 0,
+  "fixed_costs": [],
+  "capacity": 40,
+  "headcounts": [10, 20, 30, 40],
+  "currency": "円",
+  "unverified": ["料金は税込みか", "準備と撤収の時間も料金がかかるか", "決済の手数料の率"]
+}
