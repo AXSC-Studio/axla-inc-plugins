@@ -28,7 +28,9 @@ description: Use to start an in-person event you host, or to re-plan it when con
 ## 2. 一式を作る（1周目）
 1. `plan.md` を埋める。目的は社内向けと相手向けを分ける。目標の線は数と定義まで。人の判断が要る所は【G1】、会場が決まる前の数字は【仮】。実名は書かない（番号）。
 2. `budget.json` を埋め、`python3 "$S/recalc_budget.py" --event <フォルダ>`。**収支は手で計算しない**。確かめていない前提は `unverified` に入れる（budget.md に「未確認」と出る）。
-3. 資料一式を `kit/` に作る（形は config の adapters。最初は Markdown）。告知の下書きは**非公開**まで。
+3. 資料一式を `kit/` に作る。形は config の `adapters`（`${CLAUDE_PLUGIN_ROOT}/event-ops/adapters/README.md`）。
+   - 告知：`event.json` を埋めて `python3 "$S/event_page.py" --event <フォルダ>`（定員・参加費が budget.json と違えば止まる。visibility はいつも private）。アイキャッチは `python3 "$S/make_eyecatch.py" --title … --date … --out <フォルダ>/kit/eyecatch.png`
+   - 資料（概要・スポンサー向け・会場レイアウト）：manual なら Markdown、artifact なら Artifact（名前は yyyymmdd_english-name_v1.0）
 4. `python3 "$S/check_outbound.py" --names loop/marketing/event-ops/names.local --to <送る相手の番号> kit/*` が exit 0 になったら、その出力を `evidence/outbound.md` に保存して `checklist.py mark --item outbound`。
 5. 書いた項目ごとに `checklist.py mark --item <ID> --evidence <パス>`。証拠の無い項目は達成にならない。
 6. 検証役3体を並列に動かす（reviewer-prompts.md）。記録を `reviews/round-<周>-<役>.md` に保存し、`mark --item review_money|review_safety|review_outbound`。致命的が 0 でなければ達成にならない。

@@ -22,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import eventops_lib as lib  # noqa: E402
 
 PLUGIN_TEMPLATES = Path(__file__).resolve().parent.parent / "templates"
-PER_EVENT = ["plan.md", "event-log.md", "checklist.json", "budget.json", "state.json"]
+PER_EVENT = ["plan.md", "event-log.md", "checklist.json", "budget.json", "state.json", "event.json"]
 BOOTSTRAP = ["EVENTS.md", "config.json", "register.csv", "partners.csv", "names.local.example"]
 
 

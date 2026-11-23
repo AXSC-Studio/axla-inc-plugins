@@ -25,7 +25,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: テスト（実行境界・承認ゲート・検査の道具）
+      - name: 道具の部品を入れる
+        run: pip install -r plugins/axla-marketing/event-ops/scripts/requirements.txt
+      - name: テスト（実行境界・承認ゲート・内側のループ・告知）
         run: python3 -m unittest discover -s plugins/axla-marketing/event-ops/tests -v
       - name: 中立の検査（特定の会社・人の情報が無いか）
         env:
