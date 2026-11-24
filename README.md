@@ -11,10 +11,14 @@ Claude Code plugins that Axla Inc. builds and uses to run an AI-native company. 
 
 ## Install
 
+Run in your terminal. `--scope user` makes it available in every project on this Mac.
+
+```bash
+claude plugin marketplace add AXSC-Studio/axla-inc-plugins
+claude plugin install axla-legal@axla-inc-plugins --scope user
 ```
-/plugin marketplace add AXSC-Studio/axla-inc-plugins
-/plugin install axla-legal@axla-inc-plugins
-```
+
+To share it with your team through one repository instead, run the install line there with `--scope project` (it is written to that repository's settings, which you commit).
 
 ## Naming rules
 1. **One plugin = one department.** Names are `axla-` + department (`axla-legal`, `axla-marketing`). Plain words alone are held for review in the directory and clash easily with other companies' plugins. The display name goes in `displayName` (for example "Axla Legal").
@@ -54,10 +58,14 @@ Axla Inc. が「AI ネイティブカンパニー」を回すために作って�
 
 ### 入れ方
 
+ターミナルで打ちます。`--scope user` にすると、この Mac の全部のプロジェクトで使えます。
+
+```bash
+claude plugin marketplace add AXSC-Studio/axla-inc-plugins
+claude plugin install axla-legal@axla-inc-plugins --scope user
 ```
-/plugin marketplace add AXSC-Studio/axla-inc-plugins
-/plugin install axla-legal@axla-inc-plugins
-```
+
+1つのリポジトリでチームと共有したいときは、そのリポジトリで2行目を `--scope project` にして打ちます（そのリポジトリの設定に書かれるので、コミットします）。
 
 ### 名前の決まり
 1. **プラグイン＝部署。** 名前は `axla-` ＋部署名（`axla-legal`、`axla-marketing`）にする。ありふれた言葉だけの名前は、ディレクトリの審査に回り、ほかの会社の名前ともぶつかりやすいため。表示名は `displayName` で付ける（例「Axla Legal」）。

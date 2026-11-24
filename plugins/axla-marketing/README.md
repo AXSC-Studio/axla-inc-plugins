@@ -17,10 +17,14 @@ axla-marketing/
 ```
 
 ## Install
+Run in your terminal. `--scope user` makes it available in every project on this Mac.
+
+```bash
+claude plugin marketplace add AXSC-Studio/axla-inc-plugins
+claude plugin install axla-marketing@axla-inc-plugins --scope user
 ```
-/plugin marketplace add AXSC-Studio/axla-inc-plugins
-/plugin install axla-marketing@axla-inc-plugins
-```
+
+To share it with your team through one repository instead, run the install line there with `--scope project` (it is written to that repository's settings, which you commit).
 
 ## Where your data lives
 Plugins contain tools only. Your data lives in the using repository under `loop/marketing/` (event-ops uses `loop/marketing/event-ops/`).
@@ -40,10 +44,14 @@ Axla のマーケティング部署を、Claude Code のプラグインにした
 | [event-ops](event-ops/) | `/axla-marketing:plan-event` ほか3つ | 自分で会場を借りて開くイベントを、立ち上げ・会場やスポンサーとのやりとり・当日・お礼・次回への学びまで回す | plan-event と coordinate-partners（spec 002〜005） |
 
 ### 入れ方
+ターミナルで打ちます。`--scope user` にすると、この Mac の全部のプロジェクトで使えます。
+
+```bash
+claude plugin marketplace add AXSC-Studio/axla-inc-plugins
+claude plugin install axla-marketing@axla-inc-plugins --scope user
 ```
-/plugin marketplace add AXSC-Studio/axla-inc-plugins
-/plugin install axla-marketing@axla-inc-plugins
-```
+
+1つのリポジトリでチームと共有したいときは、そのリポジトリで2行目を `--scope project` にして打ちます（そのリポジトリの設定に書かれるので、コミットします）。
 
 ### データの置き場所
 プラグインは道具だけです。データは、使う側のリポジトリの `loop/marketing/` に置きます（event-ops は `loop/marketing/event-ops/`）。

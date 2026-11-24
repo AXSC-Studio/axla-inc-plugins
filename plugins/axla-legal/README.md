@@ -17,10 +17,14 @@ A Claude Code plugin that runs a contract you received (starting with NDAs) from
 - Built for **Japanese-language contracts (.docx) and Japanese business practice**. Unlike a general legal-review plugin, it edits the .docx itself and enforces the pre-send checks with hooks.
 
 ## Install
+Run in your terminal. `--scope user` makes it available in every project on this Mac.
+
+```bash
+claude plugin marketplace add AXSC-Studio/axla-inc-plugins
+claude plugin install axla-legal@axla-inc-plugins --scope user
 ```
-/plugin marketplace add AXSC-Studio/axla-inc-plugins
-/plugin install axla-legal@axla-inc-plugins
-```
+
+To share it with your team through one repository instead, run the install line there with `--scope project` (it is written to that repository's settings, which you commit).
 
 ## Data and network
 | Where it goes | What | Why |
@@ -103,10 +107,14 @@ MIT
 - **日本語の契約（.docx）と日本の実務向け**。一般の法務レビューのプラグインと違い、.docx そのものを直し、送る前の確認を Hook で止める。
 
 ### 入れ方
+ターミナルで打ちます。`--scope user` にすると、この Mac の全部のプロジェクトで使えます。
+
+```bash
+claude plugin marketplace add AXSC-Studio/axla-inc-plugins
+claude plugin install axla-legal@axla-inc-plugins --scope user
 ```
-/plugin marketplace add AXSC-Studio/axla-inc-plugins
-/plugin install axla-legal@axla-inc-plugins
-```
+
+1つのリポジトリでチームと共有したいときは、そのリポジトリで2行目を `--scope project` にして打ちます（そのリポジトリの設定に書かれるので、コミットします）。
 
 ### 通信先
 | 送り先 | 何を | なぜ |
